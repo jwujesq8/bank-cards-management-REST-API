@@ -50,11 +50,11 @@ public class Card {
 
     @OneToMany(mappedBy = "card", fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<TransactionDto> transactionsHistory;
+    private List<Transaction> transactionsHistory;
 
     public Card(String number, User owner, Date expirationDate,String status,
                 BigDecimal balance, BigDecimal transactionLimitPerDay,
-                List<TransactionDto> transactionsHistory) {
+                List<Transaction> transactionsHistory) {
         this.number = number;
         this.owner = owner;
         this.expirationDate = expirationDate;
