@@ -28,6 +28,7 @@ public class Transaction {
     @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
+    @Column(name = "local_date_time")
     private LocalDateTime localDateTime;
 
     @Column(precision = 10, scale = 2, nullable = false)

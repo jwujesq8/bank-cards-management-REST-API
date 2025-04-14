@@ -37,13 +37,15 @@ public class Card {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
+    @Column(name = "expiration_date")
     private Date expirationDate;
+
     private String status;
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal balance;
 
-    @Column(precision = 10, scale = 2)
+    @Column(name = "transaction_limit_per_day", precision = 10, scale = 2)
     private BigDecimal transactionLimitPerDay;
 
     @OneToMany(mappedBy = "card", fetch = FetchType.LAZY,
