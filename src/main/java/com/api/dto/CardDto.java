@@ -1,5 +1,8 @@
 package com.api.dto;
 
+import com.api.config.enums.CardStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -30,9 +33,8 @@ public class CardDto {
     private Date expirationDate;
 
     @NotNull(message = "Card must have status")
-    @Pattern(regexp = "^(активна|заблокирована|истек срок действия)$",
-            message = "Statuses that are acceptable: активна|заблокирована|истек срок действия")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private CardStatus status;
 
     @NotNull(message = "Card must have a balance")
     private BigDecimal balance;

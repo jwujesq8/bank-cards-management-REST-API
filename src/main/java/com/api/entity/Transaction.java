@@ -25,8 +25,12 @@ public class Transaction {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_id", nullable = false)
-    private Card card;
+    @JoinColumn(name = "source_card_id", nullable = false)
+    private Card sourceCard;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "destination_card_id", nullable = false)
+    private Card destinationCard;
 
     @Column(name = "local_date_time")
     private LocalDateTime localDateTime;
@@ -34,8 +38,9 @@ public class Transaction {
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal amount;
 
-    public Transaction(Card card, LocalDateTime dateTime, BigDecimal amount) {
-        this.card = card;
+    public Transaction(Card sourceCard, Card destinationCard, LocalDateTime dateTime, BigDecimal amount) {
+        this.sourceCard = sourceCard;
+        this.destinationCard = destinationCard;
         this.localDateTime = dateTime;
         this.amount = amount.setScale(2, RoundingMode.HALF_UP);
     }

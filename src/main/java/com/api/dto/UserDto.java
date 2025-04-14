@@ -2,6 +2,7 @@ package com.api.dto;
 
 import com.api.config.enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class UserDto {
     private String fullName;
 
     @NotNull(message = "Owner must have an email")
+    @Email(message = "Provided email has wrong pattern")
     private String email;
 
     @NotNull(message = "Owner must have a password")

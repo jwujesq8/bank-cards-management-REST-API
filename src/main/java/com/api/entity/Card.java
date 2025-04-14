@@ -1,5 +1,6 @@
 package com.api.entity;
 
+import com.api.config.enums.CardStatus;
 import com.api.dto.TransactionDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,7 +41,8 @@ public class Card {
     @Column(name = "expiration_date")
     private Date expirationDate;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private CardStatus status;
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal balance;
@@ -52,7 +54,7 @@ public class Card {
             cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Transaction> transactionsHistory;
 
-    public Card(String number, User owner, Date expirationDate,String status,
+    public Card(String number, User owner, Date expirationDate,CardStatus status,
                 BigDecimal balance, BigDecimal transactionLimitPerDay,
                 List<Transaction> transactionsHistory) {
         this.number = number;

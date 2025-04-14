@@ -19,6 +19,12 @@ public class TransactionDto {
     @NotNull(message = "Transaction must have an id")
     private UUID id;
 
+    @NotNull(message = "Transaction must have a source card")
+    private CardDto source;
+
+    @NotNull(message = "Transaction must have a destination card")
+    private CardDto destination;
+
     @NotNull(message = "Transaction must have local date and time")
     private LocalDateTime localDateTime;
 
