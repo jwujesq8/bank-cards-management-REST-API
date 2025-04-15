@@ -8,6 +8,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -50,20 +51,23 @@ public class Card {
     @Column(name = "transaction_limit_per_day", precision = 10, scale = 2)
     private BigDecimal transactionLimitPerDay;
 
-    @OneToMany(mappedBy = "card", fetch = FetchType.LAZY,
-            cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Transaction> transactionsHistory;
+    @OneToMany(mappedBy = "source", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Transaction> sentTransactions;
+
+    @OneToMany(mappedBy = "destination", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Transaction> receivedTransactions;
 
     public Card(String number, User owner, Date expirationDate,CardStatus status,
                 BigDecimal balance, BigDecimal transactionLimitPerDay,
-                List<Transaction> transactionsHistory) {
+                List<Transaction> sentTransactions, List<Transaction> receivedTransactions) {
         this.number = number;
         this.owner = owner;
         this.expirationDate = expirationDate;
         this.status = status;
         this.balance = balance.setScale(2, RoundingMode.HALF_UP);;
-        this.transactionLimitPerDay = transactionLimitPerDay.setScale(2, RoundingMode.HALF_UP);;
-        this.transactionsHistory = transactionsHistory;
+        this.transactionLimitPerDay = transactionLimitPerDay.setScale(2, RoundingMode.HALF_UP);
+        this.sentTransactions = sentTransactions;
+        this.receivedTransactions = receivedTransactions;
     }
 
 
@@ -73,6 +77,13 @@ public class Card {
 
     public void setTransactionLimitPerDay(BigDecimal transactionLimitPerDay) {
         this.transactionLimitPerDay = transactionLimitPerDay.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public List<Transaction> getHistory(){
+        List<Transaction> history = new ArrayList<>();
+        history.addAll(this.sentTransactions);
+        history.addAll(this.receivedTransactions);
+        return history;
     }
 
 }

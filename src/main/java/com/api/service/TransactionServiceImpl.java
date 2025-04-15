@@ -79,16 +79,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * @param ownerId
-     * @return
-     */
-    @Override
-    public Page<TransactionDto> findAllByOwnerId(UUID ownerId, Pageable pageable) {
-        return transactionRepository.findAllByOwnerId(ownerId, pageable).map(
-                transaction -> modelMapper.map(transaction, TransactionDto.class));
-    }
-
-    /**
      * @param sourceCardId
      * @param destinationCardId
      * @param amount
@@ -110,6 +100,10 @@ public class TransactionServiceImpl implements TransactionService {
         }
         if (!CardStatus.active.equals(destinationCard.getStatus())) {
             throw new BadRequestException("Destination card is not active or expired");
+        }
+        // Check if source and destination card are different
+        if (sourceCard.equals(destinationCard)) {
+            throw new BadRequestException("Source card and destination card must be different");
         }
         // Check if source card has sufficient funds to make the transfer
         if (sourceCard.getBalance().compareTo(amount) < 0) {

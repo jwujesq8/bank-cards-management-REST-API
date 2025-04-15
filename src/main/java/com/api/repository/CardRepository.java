@@ -22,12 +22,12 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
     Page<Card> findAllByOwnerId(UUID ownerId, Pageable pageable);
 
     @Modifying
-    @Query(value = "UPDATE cards SET transaction_limit_per_day = :newLimit WHERE id = :cardId",
+    @Query(value = "UPDATE \"bank-cards-management\".cards SET transaction_limit_per_day = :newLimit WHERE id = :cardId",
         nativeQuery = true)
     void updateTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit);
 
     @Modifying
-    @Query(value = "UPDATE cards SET status = :newStatus WHERE id = :cardId",
+    @Query(value = "UPDATE \"bank-cards-management\".cards SET status = :newStatus WHERE id = :cardId",
             nativeQuery = true)
     void updateStatus(UUID cardId, String newStatus);
 }

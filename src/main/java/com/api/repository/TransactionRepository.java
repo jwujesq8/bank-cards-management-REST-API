@@ -14,6 +14,6 @@ import java.util.UUID;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
-    Optional<Transaction> findByCardId(UUID cardId);
-    Page<Transaction> findAllByOwnerId(UUID ownerId, Pageable pageable);
+    Optional<Transaction> findBySourceId(UUID cardId);
+    Optional<Transaction> findByDestinationId(UUID cardId);
 }

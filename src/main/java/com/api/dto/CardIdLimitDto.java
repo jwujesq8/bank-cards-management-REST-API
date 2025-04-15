@@ -17,14 +17,14 @@ public class CardIdLimitDto {
 
     @NotNull(message = "Card id can't be null")
     @NotEmpty(message = "Card id can't be empty")
-    private UUID cardId;
+    private UUID id;
 
     @NotNull(message = "Card transaction limit per day can't be null")
     @DecimalMin(value = "0.00", inclusive = false)
     private BigDecimal newTransactionLimitPerDay;
 
-    public CardIdLimitDto(UUID cardId, BigDecimal newTransactionLimitPerDay) {
-        this.cardId = cardId;
+    public CardIdLimitDto(UUID id, BigDecimal newTransactionLimitPerDay) {
+        this.id = id;
         this.newTransactionLimitPerDay = newTransactionLimitPerDay.setScale(2, RoundingMode.HALF_UP);
     }
 
