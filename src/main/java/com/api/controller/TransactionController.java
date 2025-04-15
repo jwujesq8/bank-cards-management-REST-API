@@ -62,4 +62,12 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.findAll(PageRequest.of(page, size)));
     }
 
+    @PostMapping("/all/card")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Page<TransactionDto>> findAllByCard(@RequestBody IdDto cardIdDto,
+                                                        @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "3") int size){
+        return ResponseEntity.ok(transactionService.findAllByCard(cardIdDto.getId(),PageRequest.of(page, size)));
+    }
+
 }

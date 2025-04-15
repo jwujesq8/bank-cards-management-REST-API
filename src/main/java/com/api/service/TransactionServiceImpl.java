@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,5 +128,11 @@ public class TransactionServiceImpl implements TransactionService {
                 sourceCard, destinationCard, LocalDateTime.now(), amount
         );
         transactionRepository.save(transaction);
-    };
+    }
+
+    @Override
+    public Page<TransactionDto> findAllByCard(UUID cardId, Pageable pageable){
+        return transactionRepository.findByCardId(cardId, pageable)
+                .map(transaction -> modelMapper.map(transaction, TransactionDto.class));
+    }
 }

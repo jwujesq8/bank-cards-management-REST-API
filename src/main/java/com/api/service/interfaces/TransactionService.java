@@ -17,5 +17,6 @@ public interface TransactionService {
     void deleteTransactionById(UUID transactionId);
     Page<TransactionDto> findAll(Pageable pageable);
     void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount);
+    Page<TransactionDto> findAllByCard(UUID cardId, Pageable pageable);
 
 }
