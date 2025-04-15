@@ -31,7 +31,6 @@ public class PermissionChecker {
     }
 
     // where used - CardController.findAllByOwnerId()
-    // TODO: isOwnerRequestToFindAllHisCards
     public boolean isOwnerRequestToFindAllHisCards(IdDto ownerIdDto, String email){
         if(userRepository.existsByIdAndEmail(ownerIdDto.getId(), email)) return true;
         else throw new BadRequestException("Only cards owner and admin have access");

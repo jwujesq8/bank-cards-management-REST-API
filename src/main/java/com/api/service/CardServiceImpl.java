@@ -1,5 +1,6 @@
 package com.api.service;
 
+import com.api.config.EncryptionUtil;
 import com.api.config.enums.CardStatus;
 import com.api.dto.CardDto;
 import com.api.dto.CardDtoNoId;
@@ -9,6 +10,7 @@ import com.api.repository.CardRepository;
 import com.api.service.interfaces.CardService;
 import com.api.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
     private final ModelMapper modelMapper;
+    private final EncryptionUtil encryptionUtils;
 
     /**
      * @param cardId
@@ -40,6 +44,7 @@ public class CardServiceImpl implements CardService {
      */
     @Override
     public CardDto addCard(CardDtoNoId cardDtoNoId) {
+        cardDtoNoId.setNumber(encryptionUtils.encrypt(cardDtoNoId.getNumber()));
         Card card = cardRepository.save(modelMapper.map(cardDtoNoId, Card.class));
         return modelMapper.map(card, CardDto.class);
     }
@@ -50,6 +55,7 @@ public class CardServiceImpl implements CardService {
      */
     @Override
     public CardDto updateCard(CardDto cardDto) {
+        cardDto.setNumber(encryptionUtils.encrypt(cardDto.getNumber()));
         Card card = cardRepository.save(modelMapper.map(cardDto, Card.class));
         return modelMapper.map(card, CardDto.class);
     }

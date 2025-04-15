@@ -64,7 +64,7 @@ public class CardController {
         return ResponseEntity.ok(cardService.findAll(PageRequest.of(page, size)));
     }
 
-    @GetMapping("/all/owner")  // TODO: add access for owners
+    @GetMapping("/all/owner")
     @PreAuthorize("isAuthenticated() && " +
             "(hasRole('ADMIN') || @permissionChecker.isOwnerRequestToFindAllHisCards(#ownerIdDto, authentication.principal))")
     public ResponseEntity<Page<CardDto>> findAllByOwnerId(@RequestBody IdDto ownerIdDto,
