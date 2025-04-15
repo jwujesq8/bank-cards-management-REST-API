@@ -4,6 +4,7 @@ import com.api.dto.IdDto;
 import com.api.exception.BadRequestException;
 import com.api.repository.CardRepository;
 import com.api.repository.TransactionRepository;
+import com.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +14,10 @@ public class PermissionChecker {
 
     private final CardRepository cardRepository;
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
 
     // where used - TransactionController.findAllByCardId()
+    //              CardController.getCardById()
     public boolean isCardOwner(IdDto idDto, String email) {
         if(cardRepository.existsByIdAndOwnerEmail(idDto.getId(), email)) return true;
         else throw new BadRequestException("Only cards owner and admin have access");
@@ -27,9 +30,11 @@ public class PermissionChecker {
         else throw new BadRequestException("Only cards owner has access");
     }
 
-
-    // TODO: doesOwnerRequestFindAllHisCards
-    // TODO: doesOwnerRequestGetHisOwnCard
-    // TODO: doesOwnerRequestFindAllHisTransactionsByCard
+    // where used - CardController.findAllByOwnerId()
+    // TODO: isOwnerRequestToFindAllHisCards
+    public boolean isOwnerRequestToFindAllHisCards(IdDto ownerIdDto, String email){
+        if(userRepository.existsByIdAndEmail(ownerIdDto.getId(), email)) return true;
+        else throw new BadRequestException("Only cards owner and admin have access");
+    }
 
 }
