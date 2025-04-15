@@ -21,7 +21,9 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping
-    @PreAuthorize("isAuthenticated() && hasRole('ADMIN')") // TODO: add owner access
+    @PreAuthorize("isAuthenticated() && " +
+            "(hasRole('ADMIN') || " +
+            "@permissionChecker.isTransactionSourceOrDestinationOwner(#transactionIdDto, authentication.principal))")
     public ResponseEntity<TransactionDto> getTransactionById(@RequestBody IdDto transactionIdDto){
         return ResponseEntity.ok(transactionService.getTransactionById(transactionIdDto.getId()));
     }
@@ -47,7 +49,7 @@ public class TransactionController {
     }
 
     @PostMapping("/make")
-    @PreAuthorize("isAuthenticated()") // TODO: only for owners
+    @PreAuthorize("isAuthenticated()")
     public void makeTransaction(@RequestBody PaymentDto paymentDto){
         transactionService.makeTransaction(paymentDto.getSourceCardId(), paymentDto.getDestinationCardId(), paymentDto.getAmount());
     }
@@ -61,7 +63,8 @@ public class TransactionController {
 
     @PostMapping("/all/card")
     @PreAuthorize("isAuthenticated() && " +
-            "(hasRole('ADMIN'))") // TODO: add owners access
+            "(hasRole('ADMIN') || " +
+            "@permissionChecker.isCardOwner(#cardIdDto, authentication.principal))")
     public ResponseEntity<Page<TransactionDto>> findAllByCardId(@RequestBody IdDto cardIdDto,
                                                                 @RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "3") int size){

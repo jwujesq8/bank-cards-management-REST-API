@@ -30,4 +30,6 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
     @Query(value = "UPDATE \"bank-cards-management\".cards SET status = :newStatus WHERE id = :cardId",
             nativeQuery = true)
     void updateStatus(UUID cardId, String newStatus);
+
+    boolean existsByIdAndOwnerEmail(UUID cardId, String email);
 }

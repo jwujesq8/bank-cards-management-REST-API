@@ -18,8 +18,8 @@ public class CardController {
     private final CardService cardService;
 
     @PostMapping
-    @PreAuthorize("isAuthenticated() &&" +
-            "(hasRole('ADMIN'))") // TODO: add access for owners
+    @PreAuthorize("isAuthenticated() && " +
+            "(hasRole('ADMIN') || @cardOwnerPermissionChecker.isCardOwner(#cardIdDto, authentication.principal)))") // TODO: add access for owners
     public ResponseEntity<CardDto> getCardById(@RequestBody IdDto cardIdDto){
         return ResponseEntity.ok(cardService.getCardById(cardIdDto.getId()));
     }
@@ -65,8 +65,8 @@ public class CardController {
     }
 
     @GetMapping("/all/owner")
-    @PreAuthorize("isAuthenticated() &&" +
-            "( && hasRole('ADMIN'))") // TODO: add access for owners
+    @PreAuthorize("isAuthenticated() && " +
+            "(hasRole('ADMIN') || @cardOwnerPermissionChecker.isCardOwner(#ownerIdDto, authentication.principal)))") // TODO: add access for owners
     public ResponseEntity<Page<CardDto>> findAllByOwnerId(@RequestBody IdDto ownerIdDto,
                                           @RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "3") int size){

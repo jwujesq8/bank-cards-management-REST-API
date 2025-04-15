@@ -22,4 +22,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             "WHERE source_card_id = :cardId OR destination_card_id = :cardId",
             nativeQuery = true)
     Page<Transaction> findAllByCardId(@Param("cardId") UUID cardId, Pageable pageable);
+
+    boolean existsByIdAndSourceOwnerEmail(UUID id, String email);
+    boolean existsByIdAndDestinationOwnerEmail(UUID id, String email);
 }
