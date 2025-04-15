@@ -11,11 +11,12 @@ import java.util.UUID;
 
 public interface TransactionService {
 
+    TransactionDto getTransactionById(UUID transactionId);
     TransactionDto addTransaction(TransactionDtoNoId transactionDtoNoId);
     TransactionDto updateTransaction(TransactionDto transactionDto);
-    TransactionDto getTransactionById(UUID transactionId);
     void deleteTransactionById(UUID transactionId);
-    void proceedPayment(Card sourceCardId, Card destinationCardId, BigDecimal amount);
     Page<TransactionDto> findAll(Pageable pageable);
     Page<TransactionDto> findAllByOwnerId(UUID ownerId, Pageable pageable);
+    void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount);
+
 }

@@ -24,8 +24,15 @@ public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
     private final ModelMapper modelMapper;
-    private final TransactionService transactionService;
 
+    /**
+     * @param cardId
+     * @return
+     */
+    @Override
+    public CardDto getCardById(UUID cardId) {
+        return modelMapper.map(cardRepository.findById(cardId), CardDto.class);
+    }
 
     /**
      * @param cardDtoNoId
@@ -49,11 +56,24 @@ public class CardServiceImpl implements CardService {
 
     /**
      * @param cardId
+     * @param newStatus
      * @return
      */
+    @Transactional
     @Override
-    public CardDto getCardById(UUID cardId) {
-        return modelMapper.map(cardRepository.findById(cardId), CardDto.class);
+    public void updateCardStatus(UUID cardId, String newStatus) {
+        cardRepository.updateStatus(cardId, newStatus);
+    }
+
+    /**
+     * @param cardId
+     * @param newLimit
+     * @return
+     */
+    @Transactional
+    @Override
+    public void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit) {
+        cardRepository.updateTransactionLimitPerDayById(cardId, newLimit);
     }
 
     /**
@@ -74,17 +94,6 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * @param cardId
-     * @param newLimit
-     * @return
-     */
-    @Transactional
-    @Override
-    public void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit) {
-        cardRepository.updateTransactionLimitPerDayById(cardId, newLimit);
-    }
-
-    /**
      * @param ownerId
      * @return
      */
@@ -94,50 +103,4 @@ public class CardServiceImpl implements CardService {
                 .map(card -> modelMapper.map(card, CardDto.class));
     }
 
-    /**
-     * @param cardId
-     * @param newStatus
-     * @return
-     */
-    @Transactional
-    @Override
-    public void updateCardStatus(UUID cardId, String newStatus) {
-        cardRepository.updateStatus(cardId, newStatus);
-    }
-
-    /**
-     * @param sourceCardId
-     * @param destinationCardId
-     * @param amount
-     */
-    @Transactional
-    @Override
-    public void makePayment(UUID sourceCardId, UUID destinationCardId, BigDecimal amount) {
-        Card sourceCard = cardRepository.findById(sourceCardId).orElseThrow(
-                () -> new BadRequestException("There is no such source card")
-        );
-        Card destinationCard = cardRepository.findById(destinationCardId).orElseThrow(
-                () -> new BadRequestException("There is no such destination card")
-        );
-        if (!CardStatus.active.equals(sourceCard.getStatus())) {
-            throw new BadRequestException("Source card is not active or expired");
-        }
-        if (!CardStatus.active.equals(destinationCard.getStatus())) {
-            throw new BadRequestException("Destination card is not active or expired");
-        }
-        if (sourceCard.getBalance().compareTo(amount) < 0) {
-            throw new BadRequestException("Insufficient funds");
-        }
-
-        // Plus amount to the destination and minus from the source
-        sourceCard.setBalance(sourceCard.getBalance().subtract(amount));
-        destinationCard.setBalance(destinationCard.getBalance().add(amount));
-
-        cardRepository.save(sourceCard);
-        cardRepository.save(destinationCard);
-
-        // Add transactions
-        transactionService.proceedPayment(sourceCard, destinationCard, amount);
-
-    }
 }

@@ -10,13 +10,12 @@ import java.util.UUID;
 
 public interface CardService {
 
+    CardDto getCardById(UUID cardId);
     CardDto addCard(CardDtoNoId cardDtoNoId);
     CardDto updateCard(CardDto cardDto);
-    CardDto getCardById(UUID cardId);
+    void updateCardStatus(UUID cardId, String newStatus);
+    void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit);
     void deleteCardById(UUID cardId);
     Page<CardDto> findAll(Pageable pageable);
-    void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit);
     Page<CardDto> findAllByOwnerId(UUID ownerId, Pageable pageable);
-    void updateCardStatus(UUID cardId, String newStatus);
-    void makePayment(UUID sourceCardId, UUID destinationCardId, BigDecimal amount);
 }

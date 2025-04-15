@@ -1,11 +1,15 @@
 package com.api.service;
 
+import com.api.config.enums.CardStatus;
 import com.api.dto.CardDto;
 import com.api.dto.TransactionDto;
 import com.api.dto.TransactionDtoNoId;
 import com.api.entity.Card;
 import com.api.entity.Transaction;
+import com.api.exception.BadRequestException;
+import com.api.repository.CardRepository;
 import com.api.repository.TransactionRepository;
+import com.api.service.interfaces.CardService;
 import com.api.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,7 +27,17 @@ import java.util.UUID;
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final CardRepository cardRepository;
     private final ModelMapper modelMapper;
+
+    /**
+     * @param transactionId
+     * @return
+     */
+    @Override
+    public TransactionDto getTransactionById(UUID transactionId) {
+        return modelMapper.map(transactionRepository.findById(transactionId), TransactionDto.class);
+    }
 
     /**
      * @param transactionDtoNoId
@@ -47,33 +61,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     /**
      * @param transactionId
-     * @return
-     */
-    @Override
-    public TransactionDto getTransactionById(UUID transactionId) {
-        return modelMapper.map(transactionRepository.findById(transactionId), TransactionDto.class);
-    }
-
-    /**
-     * @param transactionId
      */
     @Override
     public void deleteTransactionById(UUID transactionId) {
         transactionRepository.deleteById(transactionId);
     }
 
-    /**
-     * @param sourceCardId
-     * @param destinationCardId
-     * @param amount
-     */
-    @Transactional
-    public void proceedPayment(Card sourceCardId, Card destinationCardId, BigDecimal amount){
-        Transaction transaction = new Transaction(
-                sourceCardId, destinationCardId, LocalDateTime.now(), amount
-        );
-        transactionRepository.save(transaction);
-    };
 
     /**
      * @param pageable
@@ -94,4 +87,51 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findAllByOwnerId(ownerId, pageable).map(
                 transaction -> modelMapper.map(transaction, TransactionDto.class));
     }
+
+    /**
+     * @param sourceCardId
+     * @param destinationCardId
+     * @param amount
+     */
+    @Transactional
+    @Override
+    public void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount){
+
+        // Check if both cards exist
+        Card sourceCard = cardRepository.findById(sourceCardId).orElseThrow(
+                () -> new BadRequestException("There is no such source card")
+        );
+        Card destinationCard = cardRepository.findById(destinationCardId).orElseThrow(
+                () -> new BadRequestException("There is no such destination card")
+        );
+        // Throw exception if at least one card is not active
+        if (!CardStatus.active.equals(sourceCard.getStatus())) {
+            throw new BadRequestException("Source card is not active or expired");
+        }
+        if (!CardStatus.active.equals(destinationCard.getStatus())) {
+            throw new BadRequestException("Destination card is not active or expired");
+        }
+        // Check if source card has sufficient funds to make the transfer
+        if (sourceCard.getBalance().compareTo(amount) < 0) {
+            throw new BadRequestException("Insufficient funds");
+        }
+        // Check if both source and destination cards have the same owner
+        if (!sourceCard.getOwner().equals(destinationCard.getOwner())){
+            throw new BadRequestException("Transactions may only occur between cards of the same owner");
+        }
+
+        // Plus amount to the destination and minus from the source
+        sourceCard.setBalance(sourceCard.getBalance().subtract(amount));
+        destinationCard.setBalance(destinationCard.getBalance().add(amount));
+
+        // Update cards with new balances
+        cardRepository.save(sourceCard);
+        cardRepository.save(destinationCard);
+
+        // Add transaction to the database
+        Transaction transaction = new Transaction(
+                sourceCard, destinationCard, LocalDateTime.now(), amount
+        );
+        transactionRepository.save(transaction);
+    };
 }
