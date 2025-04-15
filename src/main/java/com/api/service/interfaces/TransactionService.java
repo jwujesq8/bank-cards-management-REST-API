@@ -2,7 +2,6 @@ package com.api.service.interfaces;
 
 import com.api.dto.TransactionDto;
 import com.api.dto.TransactionDtoNoId;
-import com.api.entity.Card;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,6 +16,6 @@ public interface TransactionService {
     void deleteTransactionById(UUID transactionId);
     Page<TransactionDto> findAll(Pageable pageable);
     void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount);
-    Page<TransactionDto> findAllByCard(UUID cardId, Pageable pageable);
+    Page<TransactionDto> findAllByCardId(UUID cardId, Pageable pageable);
 
 }

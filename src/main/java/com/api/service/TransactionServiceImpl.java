@@ -1,7 +1,6 @@
 package com.api.service;
 
 import com.api.config.enums.CardStatus;
-import com.api.dto.CardDto;
 import com.api.dto.TransactionDto;
 import com.api.dto.TransactionDtoNoId;
 import com.api.entity.Card;
@@ -9,13 +8,11 @@ import com.api.entity.Transaction;
 import com.api.exception.BadRequestException;
 import com.api.repository.CardRepository;
 import com.api.repository.TransactionRepository;
-import com.api.service.interfaces.CardService;
 import com.api.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -106,14 +103,19 @@ public class TransactionServiceImpl implements TransactionService {
         if (sourceCard.equals(destinationCard)) {
             throw new BadRequestException("Source card and destination card must be different");
         }
-        // Check if source card has sufficient funds to make the transfer
-        if (sourceCard.getBalance().compareTo(amount) < 0) {
-            throw new BadRequestException("Insufficient funds");
-        }
         // Check if both source and destination cards have the same owner
         if (!sourceCard.getOwner().equals(destinationCard.getOwner())){
             throw new BadRequestException("Transactions may only occur between cards of the same owner");
         }
+        // Check if source card has sufficient funds to make the transfer
+        if (sourceCard.getBalance().compareTo(amount) < 0) {
+            throw new BadRequestException("Insufficient funds");
+        }
+        // Check if source card does not exceed the limit
+        if (sourceCard.getTransactionLimitPerDay().compareTo(amount) < 0) {
+            throw new BadRequestException("Source card has a limit per one transaction: " + sourceCard.getTransactionLimitPerDay());
+        }
+
 
         // Plus amount to the destination and minus from the source
         sourceCard.setBalance(sourceCard.getBalance().subtract(amount));
@@ -131,8 +133,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionDto> findAllByCard(UUID cardId, Pageable pageable){
-        return transactionRepository.findByCardId(cardId, pageable)
+    public Page<TransactionDto> findAllByCardId(UUID cardId, Pageable pageable){
+        return transactionRepository.findAllByCardId(cardId, pageable)
                 .map(transaction -> modelMapper.map(transaction, TransactionDto.class));
     }
 }

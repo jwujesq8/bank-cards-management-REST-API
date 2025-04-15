@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.util.List;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,5 +21,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Query(value = "SELECT * FROM \"bank-cards-management\".transactions " +
             "WHERE source_card_id = :cardId OR destination_card_id = :cardId",
             nativeQuery = true)
-    Page<Transaction> findByCardId(@Param("cardId") UUID cardId, Pageable pageable);
+    Page<Transaction> findAllByCardId(@Param("cardId") UUID cardId, Pageable pageable);
 }
