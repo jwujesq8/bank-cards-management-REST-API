@@ -39,15 +39,14 @@ ALTER TABLE "bank-cards-management".cards ADD CONSTRAINT cards_users_fk FOREIGN 
 -- Creating the 'transactions' table
 CREATE TABLE "bank-cards-management".transactions (
 	id uuid NOT NULL,
-	card_id uuid NOT NULL,
+	source_card_id uuid NOT NULL,
+	destination_card_id uuid NOT NULL,
 	local_date_time timestamp NOT NULL,
 	amount numeric(10, 2) NOT NULL,
-	CONSTRAINT transactions_pk PRIMARY KEY (id)
+	CONSTRAINT transactions_pk PRIMARY KEY (id),
+	CONSTRAINT transactions_sorce_cards_fk FOREIGN KEY (source_card_id) REFERENCES "bank-cards-management".cards(id),
+	CONSTRAINT transactions_destination_cards_fk FOREIGN KEY (destination_card_id) REFERENCES "bank-cards-management".cards(id)
 );
--- "bank-cards-management".transactions foreign keys
-ALTER TABLE "bank-cards-management".transactions ADD CONSTRAINT transactions_cards_fk FOREIGN KEY (card_id) REFERENCES "bank-cards-management".cards(id);
-
-
 
 
 
@@ -66,9 +65,10 @@ INSERT INTO "bank-cards-management".cards (id, "number", owner_id, expiration_da
 ('404ddd04-dddd-dddd-dddd-dddddddddd04', '4567-8901-2345-6789', 'c3e2f8a0-3b39-4e1c-7c58-2c0fa6eff3c3', '2029-01-01', 'blocked', 0.00, NULL),
 ('505eee05-eeee-eeee-eeee-eeeeeeeeee05', '5678-9012-3456-7890', 'd4f3a9b1-4c4a-4f2d-6d69-3d1fb7ffe4d4', '2025-01-01', 'expired', 134.75, 300.00);
 
-INSERT INTO "bank-cards-management".transactions (id, card_id, local_date_time, amount) VALUES
-('301aaa01-aaaa-aaaa-aaaa-aaaaaaaaaa01', '101aaa01-aaaa-aaaa-aaaa-aaaaaaaaaa01', '2025-04-13 14:30:00', 150.75),
-('301aaa01-aaaa-aaaa-aaaa-aaaaaaaaaa02', '202bbb02-bbbb-bbbb-bbbb-bbbbbbbbbbb2', '2025-04-12 10:15:00', 89.50),
-('301aaa01-aaaa-aaaa-aaaa-aaaaaaaaaa03', '303ccc03-cccc-cccc-cccc-cccccccccc03', '2025-04-11 18:45:00', 1020.00),
-('301aaa01-aaaa-aaaa-aaaa-aaaaaaaaaa04', '505eee05-eeee-eeee-eeee-eeeeeeeeee05', '2024-04-10 09:20:00', 300.00),
-('301aaa01-aaaa-aaaa-aaaa-aaaaaaaaaa05', '404ddd04-dddd-dddd-dddd-dddddddddd04', '2025-04-09 20:00:00', 47.99);
+INSERT INTO "bank-cards-management".transactions (id, source_card_id, destination_card_id, local_date_time, amount) VALUES
+('11111111-1111-1111-1111-111111111111', '202bbb02-bbbb-bbbb-bbbb-bbbbbbbbbbb2', '303ccc03-cccc-cccc-cccc-cccccccccc03', '2024-04-30 00:00:00.000', 1000.00),
+('22222222-2222-2222-2222-222222222222', '202bbb02-bbbb-bbbb-bbbb-bbbbbbbbbbb2', '303ccc03-cccc-cccc-cccc-cccccccccc03', '2023-12-31 00:00:00.000', 500.00),
+('33333333-3333-3333-3333-333333333333', '303ccc03-cccc-cccc-cccc-cccccccccc03', '202bbb02-bbbb-bbbb-bbbb-bbbbbbbbbbb2', '2024-08-15 00:00:00.000', 100.00),
+('44444444-4444-4444-4444-444444444444', '202bbb02-bbbb-bbbb-bbbb-bbbbbbbbbbb2', '303ccc03-cccc-cccc-cccc-cccccccccc03', '2025-01-01 00:00:00.000', 500.00),
+('55555555-5555-5555-5555-555555555555', '303ccc03-cccc-cccc-cccc-cccccccccc03', '202bbb02-bbbb-bbbb-bbbb-bbbbbbbbbbb2', '2025-01-01 00:00:00.000', 5.00);
+
