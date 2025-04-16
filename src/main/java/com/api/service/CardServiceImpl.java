@@ -50,7 +50,7 @@ public class CardServiceImpl implements CardService {
             Card card = cardRepository.save(modelMapper.map(cardDtoNoId, Card.class));
             return modelMapper.map(card, CardDto.class);
         } catch (DataIntegrityViolationException e) {
-            throw new BadRequestException("This element is already exists in the database");
+            throw new BadRequestException(e.getMessage());
         }
     }
 
