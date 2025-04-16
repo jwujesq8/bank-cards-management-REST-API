@@ -48,8 +48,8 @@ public class TransactionController {
         transactionService.deleteTransactionById(transactionIdDto.getId());
     }
 
-    @PostMapping("/make")
-    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/make") // TODO: only for owners
+    @PreAuthorize("isAuthenticated() && @permissionChecker.isSourceCardOwnerRequestToMakeTransaction(#paymentDto, authentication.principal)")
     public void makeTransaction(@RequestBody PaymentDto paymentDto){
         transactionService.makeTransaction(paymentDto.getSourceCardId(), paymentDto.getDestinationCardId(), paymentDto.getAmount());
     }

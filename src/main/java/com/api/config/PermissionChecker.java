@@ -1,6 +1,7 @@
 package com.api.config;
 
 import com.api.dto.IdDto;
+import com.api.dto.PaymentDto;
 import com.api.exception.BadRequestException;
 import com.api.repository.CardRepository;
 import com.api.repository.TransactionRepository;
@@ -34,6 +35,12 @@ public class PermissionChecker {
     public boolean isOwnerRequestToFindAllHisCards(IdDto ownerIdDto, String email){
         if(userRepository.existsByIdAndEmail(ownerIdDto.getId(), email)) return true;
         else throw new BadRequestException("Only cards owner and admin have access");
+    }
+
+    // where used - TransactionController.makeTransaction()
+    public boolean isSourceCardOwnerRequestToMakeTransaction(PaymentDto paymentDto, String email){
+        if(cardRepository.existsByIdAndOwnerEmail(paymentDto.getSourceCardId(), email)) return true;
+        else throw new BadRequestException("Only cards owner has access");
     }
 
 }

@@ -83,7 +83,7 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Transactional
     @Override
-    public void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount){ // TODO: only for owners
+    public void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount){
 
         // Check if both cards exist
         Card sourceCard = cardRepository.findById(sourceCardId).orElseThrow(
