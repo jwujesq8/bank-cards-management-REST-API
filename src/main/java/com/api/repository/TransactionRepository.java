@@ -1,6 +1,7 @@
 package com.api.repository;
 
 import com.api.entity.Transaction;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-//@Hidden
+@Hidden
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 

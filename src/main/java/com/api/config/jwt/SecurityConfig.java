@@ -52,7 +52,15 @@ public class SecurityConfig {
                             auth -> auth
                                     .requestMatchers(
                                             "/auth/login", "/auth/newAccessToken",
-                                            "/v1/bank-cards-management-api-docs/**", "/swagger-ui/**", "/v1/bank-cards-management-api-docs")
+                                            "/v1/api/**", "/swagger-ui/**", "/v1/api", "/v3/**",
+                                            "/**/actuator/**",
+                                            "/**/v3/api-docs/**",
+                                            "/**/configuration/ui/**",
+                                            "/**/swagger-resources/**",
+                                            "/**/configuration/**",
+                                            "/**/swagger-ui.html",
+                                            "/**/swagger-ui/**",
+                                            "/**/webjars/**")
                                     .permitAll()
                                     .anyRequest().authenticated()
                     )

@@ -4,6 +4,7 @@ package com.api.repository;
 import com.api.config.enums.CardStatus;
 import com.api.entity.Card;
 import com.api.entity.User;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-//@Hidden
+@Hidden
 @Repository
 public interface CardRepository extends JpaRepository<Card, UUID> {
 

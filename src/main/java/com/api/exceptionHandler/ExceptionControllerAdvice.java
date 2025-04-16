@@ -115,16 +115,16 @@ public class ExceptionControllerAdvice {
                 .body(getResponseBody(e.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorMessageResponseDto> unexpectedExceptionHandler(
-            Exception e) throws JsonProcessingException{
-
-        log.error("Exception: unexpectedException. " +
-                "Exception message: " + e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(getResponseBody(e.getMessage()));
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorMessageResponseDto> unexpectedExceptionHandler(
+//            Exception e) throws JsonProcessingException{
+//
+//        log.error("Exception: unexpectedException. " +
+//                "Exception message: " + e.getMessage());
+//        return ResponseEntity
+//                .status(HttpStatus.FORBIDDEN)
+//                .body(getResponseBody(e.getMessage()));
+//    }
 
     /**
      * Handles ValidException and returns a BAD_REQUEST response with the error message.
