@@ -122,7 +122,7 @@ public class ExceptionControllerAdvice {
         log.error("Exception: unexpectedException. " +
                 "Exception message: " + e.getMessage());
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.FORBIDDEN)
                 .body(getResponseBody(e.getMessage()));
     }
 
