@@ -104,7 +104,7 @@ public class TransactionServiceImpl implements TransactionService {
             throw new BadRequestException("Source card and destination card must be different");
         }
         // Check if both source and destination cards have the same owner
-        if (!sourceCard.getOwner().equals(destinationCard.getOwner())){
+        if (!sourceCard.getOwner().getId().equals(destinationCard.getOwner().getId())){
             throw new BadRequestException("Transactions may only occur between cards of the same owner");
         }
         // Check if source card has sufficient funds to make the transfer
