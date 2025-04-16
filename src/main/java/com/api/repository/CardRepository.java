@@ -1,6 +1,7 @@
 package com.api.repository;
 
 
+import com.api.config.enums.CardStatus;
 import com.api.entity.Card;
 import com.api.entity.User;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +23,7 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
 
     Optional<Card> findByNumber(String number);
     Page<Card> findAllByOwnerId(UUID ownerId, Pageable pageable);
+    boolean existsByIdAndOwnerEmail(UUID cardId, String email);
 
     @Modifying
     @Query(value = "UPDATE \"bank-cards-management\".cards SET transaction_limit_per_day = :newLimit WHERE id = :cardId",
@@ -31,5 +35,12 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
             nativeQuery = true)
     void updateStatus(UUID cardId, String newStatus);
 
-    boolean existsByIdAndOwnerEmail(UUID cardId, String email);
+    @Query(value = """
+            SELECT * FROM \"bank-cards-management\".cards
+            WHERE expiration_date < :date
+              AND status != :expiredStatus
+            """,
+        nativeQuery = true)
+    List<Card> findExpiredCards(LocalDateTime date, String expiredStatus);
+
 }
