@@ -12,6 +12,7 @@ import com.api.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,8 +46,12 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardDto addCard(CardDtoNoId cardDtoNoId) {
         cardDtoNoId.setNumber(encryptionUtils.encrypt(cardDtoNoId.getNumber()));
-        Card card = cardRepository.save(modelMapper.map(cardDtoNoId, Card.class));
-        return modelMapper.map(card, CardDto.class);
+        try{
+            Card card = cardRepository.save(modelMapper.map(cardDtoNoId, Card.class));
+            return modelMapper.map(card, CardDto.class);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("This element is already exists in the database");
+        }
     }
 
     /**
