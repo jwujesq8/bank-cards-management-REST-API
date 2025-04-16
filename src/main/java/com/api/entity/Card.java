@@ -30,7 +30,7 @@ public class Card {
     @GeneratedValue
     @UuidGenerator
     private UUID id;
-    private String number; // TODO: encrypted, Masked
+    private String number;
 
     /**
      * The owner of the card.

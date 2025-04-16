@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -84,7 +85,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     @Override
     public void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount){
-
         // Check if both cards exist
         Card sourceCard = cardRepository.findById(sourceCardId).orElseThrow(
                 () -> new BadRequestException("There is no such source card")
@@ -112,8 +112,14 @@ public class TransactionServiceImpl implements TransactionService {
             throw new BadRequestException("Insufficient funds");
         }
         // Check if source card does not exceed the limit
-        if (sourceCard.getTransactionLimitPerDay().compareTo(amount) < 0) {
-            throw new BadRequestException("Source card has a limit per one transaction: " + sourceCard.getTransactionLimitPerDay());
+        LocalDate now = LocalDate.now();
+        LocalDateTime start = now.atStartOfDay();
+        LocalDateTime end = now.plusDays(1).atStartOfDay();
+        BigDecimal expensesForToday = transactionRepository.getExpensesForSpecificSourceCardAndForSpecificDay(
+                sourceCardId, start, end);
+        if(sourceCard.getTransactionLimitPerDay().compareTo(expensesForToday.add(amount))<0){
+            throw new BadRequestException("Source card has a limit per one day: " + sourceCard.getTransactionLimitPerDay() +
+                    ". Your expenses for today are: " + expensesForToday);
         }
 
 

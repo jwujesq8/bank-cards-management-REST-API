@@ -19,7 +19,7 @@ import java.util.Date;
 public class CardDtoNoId {
 
     @NotNull(message = "Card must have number")
-    private String number; // TODO: encrypted, Masked
+    private String number;
 
     @NotNull(message = "Card must have an owner")
     private UserDto owner;
