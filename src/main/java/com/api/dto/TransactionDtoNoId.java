@@ -1,5 +1,6 @@
 package com.api.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -15,14 +16,18 @@ import java.util.UUID;
 public class TransactionDtoNoId {
 
     @NotNull(message = "Transaction must have a source card")
+    @Schema(description = "Source card")
     private CardDto source;
 
     @NotNull(message = "Transaction must have a destination card")
+    @Schema(description = "Destination card")
     private CardDto destination;
 
     @NotNull(message = "Transaction must have local date and time")
+    @Schema(description = "Transaction local date and time", example = "2029-04-30T00:00:00")
     private LocalDateTime localDateTime;
 
     @NotNull(message = "Transaction must have an amount")
+    @Schema(description = "Transaction amount", example = "1000.00")
     private BigDecimal amount;
 }
