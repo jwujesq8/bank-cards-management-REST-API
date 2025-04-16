@@ -14,7 +14,6 @@ import java.util.UUID;
  * Repository interface for performing CRUD operations on the User entity.
  * This interface extends JpaRepository to provide standard database operations and custom queries.
  */
-@Hidden
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 

@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Hidden
 @Repository
 public interface CardRepository extends JpaRepository<Card, UUID> {
 

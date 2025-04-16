@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                 title = "Bank Cards Management System",
                 description = "Test Api", version = "1.0.0",
                 contact = @Contact(
-                        name = "zhukovskaja.elena@gmail.com",
+                        name = "Alena - zhukovskaja.elena@gmail.com",
                         email = "zhukovskaja.elena@gmail.com"
                 )
         )

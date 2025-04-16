@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-@Hidden
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
