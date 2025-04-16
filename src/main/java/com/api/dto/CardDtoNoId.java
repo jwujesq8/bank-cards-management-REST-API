@@ -5,17 +5,17 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class CardDtoNoId {
 
     @NotNull(message = "Card must have number")
@@ -25,7 +25,7 @@ public class CardDtoNoId {
     private UserDto owner;
 
     @NotNull(message = "Card must have expiration date")
-    private Date expirationDate;
+    private LocalDateTime expirationDate;
 
     @NotNull(message = "Card must have status")
     @Enumerated(EnumType.STRING)

@@ -8,6 +8,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +41,7 @@ public class Card {
     private User owner;
 
     @Column(name = "expiration_date")
-    private Date expirationDate;
+    private LocalDateTime expirationDate;
 
     @Enumerated(EnumType.STRING)
     private CardStatus status;
@@ -57,7 +58,7 @@ public class Card {
     @OneToMany(mappedBy = "destination", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Transaction> receivedTransactions;
 
-    public Card(String number, User owner, Date expirationDate,CardStatus status,
+    public Card(String number, User owner, LocalDateTime expirationDate,CardStatus status,
                 BigDecimal balance, BigDecimal transactionLimitPerDay,
                 List<Transaction> sentTransactions, List<Transaction> receivedTransactions) {
         this.number = number;
