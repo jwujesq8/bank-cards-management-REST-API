@@ -8,6 +8,8 @@ import com.api.dto.TransactionDtoNoId;
 import com.api.dto.UserDto;
 import com.api.entity.Card;
 import com.api.entity.Transaction;
+import com.api.entity.User;
+import com.api.exception.BadRequestException;
 import com.api.repository.CardRepository;
 import com.api.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -71,7 +74,7 @@ class TransactionServiceImplTest {
                 .number("1111-2222-3333-4444")
                 .owner(userDto)
                 .expirationDate(LocalDateTime.of(2026,12,31,00,00,00))
-                .balance(BigDecimal.valueOf(500.00))
+                .balance(BigDecimal.valueOf(1000.00))
                 .transactionLimitPerDay(BigDecimal.valueOf(1000.00))
                 .status(CardStatus.active)
                 .build();
@@ -162,7 +165,7 @@ class TransactionServiceImplTest {
                     eq(sourceCardId), any(), any())).thenReturn(spentToday);
 
             transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount());
-            assertEquals(new BigDecimal("480.00"), sourceCard.getBalance());
+            assertEquals(new BigDecimal("980.00"), sourceCard.getBalance());
             assertEquals(new BigDecimal("1520.00"), destinationCard.getBalance());
 
             verify(cardRepository).save(sourceCard);
@@ -170,84 +173,63 @@ class TransactionServiceImplTest {
             verify(transactionRepository).save(any(Transaction.class));
         }
 
-        @Test // todo
-        public void diffCardsOwners_shouldThrowException(){
-            BigDecimal spentToday = new BigDecimal("200.00");
-            Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
-            Card destinationCard = modelMapper.map(destinationCardDto, Card.class);
-
-            when(cardRepository.findById(sourceCardId)).thenReturn(Optional.of(sourceCard));
-            when(cardRepository.findById(destinationCardId)).thenReturn(Optional.of(destinationCard));
-            when(transactionRepository.getExpensesForSpecificSourceCardAndForSpecificDay(
-                    eq(sourceCardId), any(), any())).thenReturn(spentToday);
-
-            transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount());
-            assertEquals(new BigDecimal("480.00"), sourceCard.getBalance());
-            assertEquals(new BigDecimal("1520.00"), destinationCard.getBalance());
-
-            verify(cardRepository).save(sourceCard);
-            verify(cardRepository).save(destinationCard);
-            verify(transactionRepository).save(any(Transaction.class));
-        }
-
-        @Test // todo
-        public void notSufficientFunds_shouldThrowException(){
-            BigDecimal spentToday = new BigDecimal("200.00");
-            Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
-            Card destinationCard = modelMapper.map(destinationCardDto, Card.class);
-
-            when(cardRepository.findById(sourceCardId)).thenReturn(Optional.of(sourceCard));
-            when(cardRepository.findById(destinationCardId)).thenReturn(Optional.of(destinationCard));
-            when(transactionRepository.getExpensesForSpecificSourceCardAndForSpecificDay(
-                    eq(sourceCardId), any(), any())).thenReturn(spentToday);
-
-            transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount());
-            assertEquals(new BigDecimal("480.00"), sourceCard.getBalance());
-            assertEquals(new BigDecimal("1520.00"), destinationCard.getBalance());
-
-            verify(cardRepository).save(sourceCard);
-            verify(cardRepository).save(destinationCard);
-            verify(transactionRepository).save(any(Transaction.class));
-        }
-
-        @Test // todo
+        @Test
         public void blockedCard_shouldThrowException(){
-            BigDecimal spentToday = new BigDecimal("200.00");
             Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
+            sourceCard.setStatus(CardStatus.blocked);
             Card destinationCard = modelMapper.map(destinationCardDto, Card.class);
 
             when(cardRepository.findById(sourceCardId)).thenReturn(Optional.of(sourceCard));
             when(cardRepository.findById(destinationCardId)).thenReturn(Optional.of(destinationCard));
-            when(transactionRepository.getExpensesForSpecificSourceCardAndForSpecificDay(
-                    eq(sourceCardId), any(), any())).thenReturn(spentToday);
 
-            transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount());
-            assertEquals(new BigDecimal("480.00"), sourceCard.getBalance());
-            assertEquals(new BigDecimal("1520.00"), destinationCard.getBalance());
-
-            verify(cardRepository).save(sourceCard);
-            verify(cardRepository).save(destinationCard);
-            verify(transactionRepository).save(any(Transaction.class));
+            assertThrows(BadRequestException.class, () -> transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount()));
         }
 
-        @Test // todo
+        @Test
         public void expiredCard_shouldThrowException(){
-            BigDecimal spentToday = new BigDecimal("200.00");
+            Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
+            Card destinationCard = modelMapper.map(destinationCardDto, Card.class);
+            destinationCard.setStatus(CardStatus.expired);
+
+            when(cardRepository.findById(sourceCardId)).thenReturn(Optional.of(sourceCard));
+            when(cardRepository.findById(destinationCardId)).thenReturn(Optional.of(destinationCard));
+
+            assertThrows(BadRequestException.class, () -> transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount()));
+        }
+
+        @Test
+        public void sourceAndDestinationCardsAreTheSame_shouldThrowException(){
+            Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
+            Card destinationCard = modelMapper.map(sourceCardDto, Card.class);
+
+            when(cardRepository.findById(sourceCard.getId())).thenReturn(Optional.of(sourceCard));
+            when(cardRepository.findById(destinationCard.getId())).thenReturn(Optional.of(destinationCard));
+
+            assertThrows(BadRequestException.class, () -> transactionService.makeTransaction(
+                    sourceCard.getId(), destinationCard.getId(), transactionDto.getAmount()));
+        }
+
+        @Test
+        public void diffCardsOwners_shouldThrowException(){
+            Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
+            sourceCard.setOwner(User.builder().id(UUID.randomUUID()).email("js@gmail.com").password("456wer123").fullName("Name Surname").role(Role.USER).build());
+            Card destinationCard = modelMapper.map(destinationCardDto, Card.class);
+
+            when(cardRepository.findById(sourceCardId)).thenReturn(Optional.of(sourceCard));
+            when(cardRepository.findById(destinationCardId)).thenReturn(Optional.of(destinationCard));
+
+            assertThrows(BadRequestException.class, () -> transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount()));
+        }
+
+        @Test
+        public void notSufficientFunds_shouldThrowException(){
             Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
             Card destinationCard = modelMapper.map(destinationCardDto, Card.class);
 
             when(cardRepository.findById(sourceCardId)).thenReturn(Optional.of(sourceCard));
             when(cardRepository.findById(destinationCardId)).thenReturn(Optional.of(destinationCard));
-            when(transactionRepository.getExpensesForSpecificSourceCardAndForSpecificDay(
-                    eq(sourceCardId), any(), any())).thenReturn(spentToday);
 
-            transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount());
-            assertEquals(new BigDecimal("480.00"), sourceCard.getBalance());
-            assertEquals(new BigDecimal("1520.00"), destinationCard.getBalance());
-
-            verify(cardRepository).save(sourceCard);
-            verify(cardRepository).save(destinationCard);
-            verify(transactionRepository).save(any(Transaction.class));
+            assertThrows(BadRequestException.class, () -> transactionService.makeTransaction(sourceCardId, destinationCardId, new BigDecimal("1500.00")));
         }
 
         @Test // todo
@@ -261,13 +243,7 @@ class TransactionServiceImplTest {
             when(transactionRepository.getExpensesForSpecificSourceCardAndForSpecificDay(
                     eq(sourceCardId), any(), any())).thenReturn(spentToday);
 
-            transactionService.makeTransaction(sourceCardId, destinationCardId, transactionDto.getAmount());
-            assertEquals(new BigDecimal("480.00"), sourceCard.getBalance());
-            assertEquals(new BigDecimal("1520.00"), destinationCard.getBalance());
-
-            verify(cardRepository).save(sourceCard);
-            verify(cardRepository).save(destinationCard);
-            verify(transactionRepository).save(any(Transaction.class));
+            assertThrows(BadRequestException.class, () -> transactionService.makeTransaction(sourceCardId, destinationCardId, new BigDecimal("900.00")));
         }
     }
 

@@ -100,7 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
             throw new BadRequestException("Destination card is not active or expired");
         }
         // Check if source and destination card are different
-        if (sourceCard.equals(destinationCard)) {
+        if (sourceCard.getId().equals(destinationCard.getId())) {
             throw new BadRequestException("Source card and destination card must be different");
         }
         // Check if both source and destination cards have the same owner
