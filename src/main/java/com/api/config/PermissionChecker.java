@@ -2,7 +2,7 @@ package com.api.config;
 
 import com.api.dto.IdDto;
 import com.api.dto.PaymentDto;
-import com.api.exception.BadRequestException;
+import com.api.exception.ForbiddenException;
 import com.api.repository.CardRepository;
 import com.api.repository.TransactionRepository;
 import com.api.repository.UserRepository;
@@ -21,26 +21,26 @@ public class PermissionChecker {
     //              CardController.getCardById()
     public boolean isCardOwner(IdDto idDto, String email) {
         if(cardRepository.existsByIdAndOwnerEmail(idDto.getId(), email)) return true;
-        else throw new BadRequestException("Only cards owner and admin have access");
+        else throw new ForbiddenException("Only cards owner and admin have access");
     }
 
     // where used - TransactionController.getTransactionById()
     public boolean isTransactionSourceOrDestinationOwner(IdDto transactionIdDto, String email){
         if(transactionRepository.existsByIdAndSourceOwnerEmail(transactionIdDto.getId(), email)) return true;
         if(transactionRepository.existsByIdAndDestinationOwnerEmail(transactionIdDto.getId(), email)) return true;
-        else throw new BadRequestException("Only cards owner has access");
+        else throw new ForbiddenException("Only cards owner has access");
     }
 
     // where used - CardController.findAllByOwnerId()
     public boolean isOwnerRequestToFindAllHisCards(IdDto ownerIdDto, String email){
         if(userRepository.existsByIdAndEmail(ownerIdDto.getId(), email)) return true;
-        else throw new BadRequestException("Only cards owner and admin have access");
+        else throw new ForbiddenException("Only cards owner and admin have access");
     }
 
     // where used - TransactionController.makeTransaction()
     public boolean isSourceCardOwnerRequestToMakeTransaction(PaymentDto paymentDto, String email){
         if(cardRepository.existsByIdAndOwnerEmail(paymentDto.getSourceCardId(), email)) return true;
-        else throw new BadRequestException("Only cards owner has access");
+        else throw new ForbiddenException("Only cards owner has access");
     }
 
 }

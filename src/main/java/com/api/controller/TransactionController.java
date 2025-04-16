@@ -1,11 +1,13 @@
 package com.api.controller;
 
-import com.api.dto.IdDto;
-import com.api.dto.PaymentDto;
-import com.api.dto.TransactionDto;
-import com.api.dto.TransactionDtoNoId;
+import com.api.dto.*;
+import com.api.dto.error.ValidationErrorMessageResponseDto;
 import com.api.service.interfaces.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,10 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @Operation(summary = "get transaction by id - only for admin and source or destination card owner")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = TransactionDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
+    )
     @PostMapping
     @PreAuthorize("isAuthenticated() && " +
             "(hasRole('ADMIN') || " +
@@ -32,6 +38,11 @@ public class TransactionController {
     }
 
     @Operation(summary = "add new transaction - only for admin")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "New transaction is created", content = @Content(schema = @Schema(implementation = TransactionDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad request (non valid data)",  content = @Content(schema = @Schema(implementation = ValidationErrorMessageResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
+    )
     @PostMapping("/new")
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
     public ResponseEntity<TransactionDto> addTransaction(@RequestBody @Valid TransactionDtoNoId transactionDtoNoId){
@@ -41,6 +52,11 @@ public class TransactionController {
     }
 
     @Operation(summary = "update transaction that already exists in the database - only for admin")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Transaction is updated", content = @Content(schema = @Schema(implementation = TransactionDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad request (non valid data)",  content = @Content(schema = @Schema(implementation = ValidationErrorMessageResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
+    )
     @PutMapping
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
     public ResponseEntity<TransactionDto> updateTransaction(@RequestBody @Valid TransactionDto transactionDto){
@@ -48,6 +64,10 @@ public class TransactionController {
     }
 
     @Operation(summary = "delete transaction by id - only for admin")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Transaction is deleted or does not exist"),
+            @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
+    )
     @DeleteMapping
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
     public void deleteTransactionById(@RequestBody @Valid IdDto transactionIdDto){
@@ -55,6 +75,10 @@ public class TransactionController {
     }
 
     @Operation(summary = "make a transaction - only for a source card owner")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Transaction is made"),
+            @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
+    )
     @PostMapping("/make")
     @PreAuthorize("isAuthenticated() && @permissionChecker.isSourceCardOwnerRequestToMakeTransaction(#paymentDto, authentication.principal)")
     public void makeTransaction(@RequestBody @Valid PaymentDto paymentDto){
@@ -62,6 +86,10 @@ public class TransactionController {
     }
 
     @Operation(summary = "get all transactions (paging) - only for admin")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
+    )
     @GetMapping("/all")
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
     public ResponseEntity<Page<TransactionDto>> findAll(@RequestParam(defaultValue = "0") int page,
@@ -70,6 +98,10 @@ public class TransactionController {
     }
 
     @Operation(summary = "get all transaction by source or destination card id (paging) - only for admin and card owner")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = TransactionDto.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
+    )
     @PostMapping("/all/card")
     @PreAuthorize("isAuthenticated() && " +
             "(hasRole('ADMIN') || " +

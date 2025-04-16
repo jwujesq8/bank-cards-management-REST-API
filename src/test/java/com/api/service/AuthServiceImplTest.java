@@ -5,7 +5,7 @@ import com.api.config.jwt.JwtProvider;
 import com.api.dto.jwt.JwtRequestDto;
 import com.api.dto.jwt.JwtResponseDto;
 import com.api.entity.User;
-import com.api.exception.AuthException;
+import com.api.exception.ForbiddenException;
 import com.api.exception.BadRequestException;
 import com.api.exception.OkException;
 import com.api.service.interfaces.UserService;
@@ -109,7 +109,7 @@ class AuthServiceImplTest {
         @Test()
         public void invalidRefreshToken() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
-            assertThrows(AuthException.class, () -> authService.getNewAccessToken("invalidToken"));
+            assertThrows(ForbiddenException.class, () -> authService.getNewAccessToken("invalidToken"));
         }
     }
 
@@ -138,7 +138,7 @@ class AuthServiceImplTest {
         @Test()
         public void invalidRefreshToken() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
-            assertThrows(AuthException.class, () -> authService.refresh("invalidToken"));
+            assertThrows(ForbiddenException.class, () -> authService.refresh("invalidToken"));
         }
     }
 
@@ -164,7 +164,7 @@ class AuthServiceImplTest {
         public void invalidRefreshToken() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
 
-            assertThrows(AuthException.class, () -> authService.logout("invalidToken"));
+            assertThrows(ForbiddenException.class, () -> authService.logout("invalidToken"));
         }
 
         @Test()

@@ -70,14 +70,14 @@ public class ExceptionControllerAdvice {
      * @return A ResponseEntity with a custom error message and an UNAUTHORIZED status.
      * @throws JsonProcessingException if the error message cannot be processed.
      */
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<ErrorMessageResponseDto> authExceptionHandler(AuthException e) throws JsonProcessingException {
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorMessageResponseDto> authExceptionHandler(ForbiddenException e) throws JsonProcessingException {
 
-        log.error("Exception: AuthenticationException. " +
+        log.error("Exception: ForbiddenException. " +
                 "Exception message: " + e.getMessage());
 
         return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
+                .status(HttpStatus.FORBIDDEN)
                 .body(getResponseBody(e.getMessage()));
     }
 
