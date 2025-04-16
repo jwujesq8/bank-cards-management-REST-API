@@ -2,6 +2,7 @@ package com.api.controller;
 
 import com.api.dto.*;
 import com.api.service.interfaces.CardService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,13 +21,13 @@ public class CardController {
     @PostMapping
     @PreAuthorize("isAuthenticated() && " +
             "(hasRole('ADMIN') || @permissionChecker.isCardOwner(#cardIdDto, authentication.principal))")
-    public ResponseEntity<CardDto> getCardById(@RequestBody IdDto cardIdDto){
+    public ResponseEntity<CardDto> getCardById(@RequestBody @Valid IdDto cardIdDto){
         return ResponseEntity.ok(cardService.getCardById(cardIdDto.getId()));
     }
 
     @PostMapping("/new")
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
-    public ResponseEntity<CardDto> addCard(@RequestBody CardDtoNoId cardDtoNoId){
+    public ResponseEntity<CardDto> addCard(@RequestBody @Valid CardDtoNoId cardDtoNoId){
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(cardService.addCard(cardDtoNoId));
@@ -34,26 +35,26 @@ public class CardController {
 
     @PutMapping
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
-    public ResponseEntity<CardDto> updateCard(@RequestBody CardDto cardDto) {
+    public ResponseEntity<CardDto> updateCard(@RequestBody @Valid CardDto cardDto) {
         return ResponseEntity.ok(cardService.updateCard(cardDto));
     }
 
     @PutMapping("/status")
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
-    public void updateCardStatus(@RequestBody CardIdStatusDto cardIdStatusDto){
+    public void updateCardStatus(@RequestBody @Valid CardIdStatusDto cardIdStatusDto){
         cardService.updateCardStatus(cardIdStatusDto.getId(), cardIdStatusDto.getNewStatus().name());
     }
 
     @PutMapping("/transactionLimitPerDay")
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
-    public void updateCardsTransactionLimitPerDayById(@RequestBody CardIdLimitDto cardIdLimitDto){
+    public void updateCardsTransactionLimitPerDayById(@RequestBody @Valid CardIdLimitDto cardIdLimitDto){
         cardService.updateCardsTransactionLimitPerDayById(cardIdLimitDto.getId(),
                 cardIdLimitDto.getNewTransactionLimitPerDay());
     }
 
     @DeleteMapping
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
-    public void deleteCardById(@RequestBody IdDto cardIdDto){
+    public void deleteCardById(@RequestBody @Valid IdDto cardIdDto){
         cardService.deleteCardById(cardIdDto.getId());
     }
 
@@ -67,7 +68,7 @@ public class CardController {
     @GetMapping("/all/owner")
     @PreAuthorize("isAuthenticated() && " +
             "(hasRole('ADMIN') || @permissionChecker.isOwnerRequestToFindAllHisCards(#ownerIdDto, authentication.principal))")
-    public ResponseEntity<Page<CardDto>> findAllByOwnerId(@RequestBody IdDto ownerIdDto,
+    public ResponseEntity<Page<CardDto>> findAllByOwnerId(@RequestBody @Valid IdDto ownerIdDto,
                                           @RequestParam(defaultValue = "0") int page,
                                           @RequestParam(defaultValue = "3") int size){
         return ResponseEntity.ok(cardService.findAllByOwnerId(ownerIdDto.getId(), PageRequest.of(page,size)));

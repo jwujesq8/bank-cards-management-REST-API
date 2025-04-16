@@ -16,11 +16,10 @@ import java.util.UUID;
 public class CardIdLimitDto {
 
     @NotNull(message = "Card id can't be null")
-    @NotEmpty(message = "Card id can't be empty")
     private UUID id;
 
     @NotNull(message = "Card transaction limit per day can't be null")
-    @DecimalMin(value = "0.00", inclusive = false)
+    @DecimalMin(value = "100.00", message = "Min card limit is 100")
     private BigDecimal newTransactionLimitPerDay;
 
     public CardIdLimitDto(UUID id, BigDecimal newTransactionLimitPerDay) {

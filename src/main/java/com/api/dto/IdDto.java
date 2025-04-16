@@ -15,7 +15,6 @@ import java.util.UUID;
 public class IdDto {
 
     @NotNull(message = "Id can't be null")
-    @NotEmpty(message = "Id can't be empty")
     private UUID id;
 
 }

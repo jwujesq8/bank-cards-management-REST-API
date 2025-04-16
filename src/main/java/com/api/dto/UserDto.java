@@ -3,6 +3,7 @@ package com.api.dto;
 import com.api.config.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class UserDto {
     private UUID id;
 
     @NotNull(message = "Owner must have a full name")
+    @NotEmpty(message = "Full name can't be empty")
     private String fullName;
 
     @NotNull(message = "Owner must have an email")
@@ -26,6 +28,7 @@ public class UserDto {
     private String email;
 
     @NotNull(message = "Owner must have a password")
+    @NotEmpty(message = "Password can't be empty")
     private String password;
 
     @NotNull(message = "Owner must have a role")

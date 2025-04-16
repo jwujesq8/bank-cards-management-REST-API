@@ -19,7 +19,6 @@ import java.util.UUID;
 public class CardIdStatusDto {
 
     @NotNull(message = "Card id can't be null")
-    @NotEmpty(message = "Card id can't be empty")
     private UUID id;
 
     @NotNull(message = "New cards status can't be null")

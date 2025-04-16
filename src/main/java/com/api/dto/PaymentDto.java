@@ -18,11 +18,9 @@ import java.util.UUID;
 public class PaymentDto {
 
     @NotNull(message = "Card id can't be null")
-    @NotEmpty(message = "Card id can't be empty")
     private UUID sourceCardId;
 
     @NotNull(message = "Card id can't be null")
-    @NotEmpty(message = "Card id can't be empty")
     private UUID destinationCardId;
 
     @NotNull(message = "Transaction amount can't be null")
