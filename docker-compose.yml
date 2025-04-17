@@ -11,13 +11,13 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
       SPRING_JPA_SHOW_SQL: false
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
-      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: bank-cards-management
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: bank_cards_management
       SPRINGDOC_SWAGGER_UI_URL: /v1/bank-cards-management-api-docs
       SPRINGDOC_API_DOCS_PATH: /v1/bank-cards-management-api-docs
       SPRING_MAIN_ALLOW_CIRCULAR_REFERENCES: no
       JWT_ACCESS_PATH: /app/jwt/access.txt
       JWT_REFRESH_PATH: /app/jwt/refresh.txt
-      SECRET_KEY: /app/secret-key.txt
+      SECRET_KEY_PATH: /app/encryption-util/secret-key.txt
     depends_on:
       - db
 

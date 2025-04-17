@@ -55,7 +55,7 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
      * @param newLimit The new transaction limit per day.
      */
     @Modifying
-    @Query(value = "UPDATE \"bank-cards-management\".cards SET transaction_limit_per_day = :newLimit WHERE id = :cardId",
+    @Query(value = "UPDATE \"bank_cards_management\".cards SET transaction_limit_per_day = :newLimit WHERE id = :cardId",
         nativeQuery = true)
     void updateTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit);
 
@@ -67,7 +67,7 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
      * @param newStatus The new status of the card.
      */
     @Modifying
-    @Query(value = "UPDATE \"bank-cards-management\".cards SET status = :newStatus WHERE id = :cardId",
+    @Query(value = "UPDATE \"bank_cards_management\".cards SET status = :newStatus WHERE id = :cardId",
             nativeQuery = true)
     void updateStatus(UUID cardId, String newStatus);
 
@@ -78,7 +78,7 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
      * @param expiredStatus The status that indicates a card is expired.
      */
     @Query(value = """
-            SELECT * FROM \"bank-cards-management\".cards
+            SELECT * FROM \"bank_cards_management\".cards
             WHERE expiration_date < :date
               AND status != :expiredStatus
             """,

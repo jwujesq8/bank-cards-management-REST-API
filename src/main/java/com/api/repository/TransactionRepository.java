@@ -61,7 +61,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
      * @param cardId The ID of the card to search for in the source or destination.
      * @param pageable The pagination information.
      */
-    @Query(value = "SELECT * FROM \"bank-cards-management\".transactions " +
+    @Query(value = "SELECT * FROM \"bank_cards_management\".transactions " +
             "WHERE source_card_id = :cardId OR destination_card_id = :cardId",
             nativeQuery = true)
     Page<Transaction> findAllByCardId(@Param("cardId") UUID cardId, Pageable pageable);
@@ -75,7 +75,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
      */
     @Query(value = """
             SELECT COALESCE(SUM(amount), 0)
-            FROM \"bank-cards-management\".transactions
+            FROM \"bank_cards_management\".transactions
             WHERE local_date_time >= :startDate
               AND local_date_time < :endDate
               AND source_card_id = :sourceCardId
