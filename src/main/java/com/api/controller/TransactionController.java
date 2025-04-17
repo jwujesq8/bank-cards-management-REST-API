@@ -19,6 +19,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Class TransactionController
+ *
+ * TransactionController handles API requests related to user card transactions.
+ * It provides endpoints for adding, updating, deleting, and retrieving transactions, with appropriate authorization checks.
+ */
 @RestController
 @RequestMapping("/transaction")
 @RequiredArgsConstructor
@@ -28,6 +34,13 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    /**
+     * Get a transaction by its ID.
+     * Accessible only by the admin or the source or destination card owner.
+     *
+     * @param transactionIdDto DTO containing the ID of the transaction to retrieve
+     * @return ResponseEntity containing the TransactionDto of the requested transaction
+     */
     @Operation(summary = "get transaction by id - only for admin and source or destination card owner")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = TransactionDto.class))),
@@ -41,6 +54,13 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getTransactionById(transactionIdDto.getId()));
     }
 
+    /**
+     * Creates a new transaction.
+     * Accessible only by the admin.
+     *
+     * @param transactionDtoNoId DTO containing the details of the transaction to create
+     * @return ResponseEntity containing the created TransactionDto
+     */
     @Operation(summary = "add new transaction - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "New transaction is created", content = @Content(schema = @Schema(implementation = TransactionDto.class), mediaType = "application/json")),
@@ -55,6 +75,13 @@ public class TransactionController {
                 .body(transactionService.addTransaction(transactionDtoNoId));
     }
 
+    /**
+     * Updates an existing transaction.
+     * Accessible only by the admin.
+     *
+     * @param transactionDto DTO containing the updated transaction details
+     * @return ResponseEntity containing the updated TransactionDto
+     */
     @Operation(summary = "update transaction that already exists in the database - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Transaction is updated", content = @Content(schema = @Schema(implementation = TransactionDto.class), mediaType = "application/json")),
@@ -67,6 +94,12 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.updateTransaction(transactionDto));
     }
 
+    /**
+     * Deletes a transaction by its ID.
+     * Accessible only by the admin.
+     *
+     * @param transactionIdDto DTO containing the ID of the transaction to delete
+     */
     @Operation(summary = "delete transaction by id - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Transaction is deleted or does not exist"),
@@ -78,6 +111,12 @@ public class TransactionController {
         transactionService.deleteTransactionById(transactionIdDto.getId());
     }
 
+    /**
+     * Initiates a transaction between two cards.
+     * Accessible only by the source card owner.
+     *
+     * @param paymentDto DTO containing the details of the transaction to be made
+     */
     @Operation(summary = "make a transaction - only for a source card owner")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Transaction is made"),
@@ -89,6 +128,14 @@ public class TransactionController {
         transactionService.makeTransaction(paymentDto.getSourceCardId(), paymentDto.getDestinationCardId(), paymentDto.getAmount());
     }
 
+    /**
+     * Fetches all transactions with pagination.
+     * Accessible only by the admin.
+     *
+     * @param page The page number (default 0)
+     * @param size The page size (default 3)
+     * @return ResponseEntity containing a Page of TransactionDto objects
+     */
     @Operation(summary = "get all transactions (paging) - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success"),
@@ -101,6 +148,15 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.findAll(PageRequest.of(page, size)));
     }
 
+    /**
+     * Fetches all transactions by card ID with pagination.
+     * Accessible by both the admin and card owner.
+     *
+     * @param cardIdDto DTO containing the card ID
+     * @param page The page number (default 0)
+     * @param size The page size (default 3)
+     * @return ResponseEntity containing a Page of TransactionDto objects
+     */
     @Operation(summary = "get all transaction by source or destination card id (paging) - only for admin and card owner")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = TransactionDto.class), mediaType = "application/json")),

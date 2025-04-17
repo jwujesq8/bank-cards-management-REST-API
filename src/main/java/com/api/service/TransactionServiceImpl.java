@@ -15,12 +15,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Class TransactionServiceImpl
+ *
+ * Service implementation for managing transactions.
+ * Provides methods for adding, updating, deleting, and retrieving transaction information,
+ * as well as handling the logic for making transactions between cards.
+ */
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
@@ -30,8 +36,9 @@ public class TransactionServiceImpl implements TransactionService {
     private final ModelMapper modelMapper;
 
     /**
-     * @param transactionId
-     * @return
+     * Retrieves a transaction by its ID.
+     *
+     * @param transactionId The ID of the transaction to be retrieved.
      */
     @Override
     public TransactionDto getTransactionById(UUID transactionId) {
@@ -39,8 +46,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * @param transactionDtoNoId
-     * @return
+     * Adds a new transaction.
+     *
+     * @param transactionDtoNoId The transaction details without the ID.
      */
     @Override
     public TransactionDto addTransaction(TransactionDtoNoId transactionDtoNoId) {
@@ -49,8 +57,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * @param transactionDto
-     * @return
+     * Updates an existing transaction.
+     *
+     * @param transactionDto The updated transaction details.
      */
     @Override
     public TransactionDto updateTransaction(TransactionDto transactionDto) {
@@ -59,17 +68,19 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * @param transactionId
+     * Deletes a transaction by its ID.
+     *
+     * @param transactionId The ID of the transaction to be deleted.
      */
     @Override
     public void deleteTransactionById(UUID transactionId) {
         transactionRepository.deleteById(transactionId);
     }
 
-
     /**
-     * @param pageable
-     * @return
+     * Retrieves all transactions with pagination.
+     *
+     * @param pageable Pagination information.
      */
     @Override
     public Page<TransactionDto> findAll(Pageable pageable) {
@@ -78,9 +89,14 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     /**
-     * @param sourceCardId
-     * @param destinationCardId
-     * @param amount
+     * Handles the logic of making a transaction between two cards.
+     * The method ensures that the source card has sufficient balance,
+     * checks the transaction limits, and updates the balances of both cards accordingly.
+     *
+     * @param sourceCardId      The ID of the source card.
+     * @param destinationCardId The ID of the destination card.
+     * @param amount            The amount to be transferred.
+     * @throws BadRequestException If any validation check fails.
      */
     @Transactional
     @Override
@@ -122,7 +138,6 @@ public class TransactionServiceImpl implements TransactionService {
                     ". Your expenses for today are: " + expensesForToday);
         }
 
-
         // Plus amount to the destination and minus from the source
         sourceCard.setBalance(sourceCard.getBalance().subtract(amount));
         destinationCard.setBalance(destinationCard.getBalance().add(amount));
@@ -138,6 +153,13 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.save(transaction);
     }
 
+    /**
+     * Retrieves all transactions for a specific card with pagination.
+     *
+     * @param cardId  The ID of the card to retrieve transactions for.
+     * @param pageable Pagination information.
+     * @return A {@link Page} of {@link TransactionDto} objects representing the transactions for the specified card.
+     */
     @Override
     public Page<TransactionDto> findAllByCardId(UUID cardId, Pageable pageable){
         return transactionRepository.findAllByCardId(cardId, pageable)

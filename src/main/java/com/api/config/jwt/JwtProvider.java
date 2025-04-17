@@ -73,7 +73,6 @@ public class JwtProvider {
      * The token contains the user's email, full name, role, and the issue and expiration dates.
      *
      * @param user the user for whom the access token is generated.
-     * @return the generated JWT access token.
      */
     public String generateAccessToken(@NonNull User user) {
 
@@ -96,7 +95,6 @@ public class JwtProvider {
      * The token contains the user's email, role, and the expiration date set to 24 hours from the current time.
      *
      * @param user the user for whom the refresh token is generated.
-     * @return the generated JWT refresh token.
      */
     public String generateRefreshToken(@NotNull User user){
 
@@ -117,7 +115,6 @@ public class JwtProvider {
      *
      * @param token the JWT token to parse.
      * @param secret the secret key used to validate the token.
-     * @return the claims contained in the JWT token.
      */
     private Claims getClaims(@NonNull String token, @NonNull Key secret) {
         return Jwts.parserBuilder()
@@ -131,7 +128,6 @@ public class JwtProvider {
      * Extracts the claims from the given access token.
      *
      * @param token the JWT access token to parse.
-     * @return the claims contained in the JWT access token.
      */
     public Claims getAccessClaims(@NonNull String token) {
         return getClaims(token, accessSecretKey);
@@ -141,7 +137,6 @@ public class JwtProvider {
      * Extracts the claims from the given refresh token.
      *
      * @param token the JWT refresh token to parse.
-     * @return the claims contained in the JWT refresh token.
      */
     public Claims getRefreshClaims(@NonNull String token) {
         return getClaims(token, refreshSecretKey);
@@ -153,7 +148,6 @@ public class JwtProvider {
      *
      * @param token the JWT token to validate.
      * @param secret the secret key used to validate the token.
-     * @return true if the token is valid, otherwise throws an exception.
      */
     private boolean validateToken(@NonNull String token, @NonNull Key secret) {
         try {
@@ -184,7 +178,6 @@ public class JwtProvider {
      * Validates the given access token.
      *
      * @param accessToken the JWT access token to validate.
-     * @return true if the access token is valid, false otherwise.
      */
     public boolean validateAccessToken(@NonNull String accessToken){
         return validateToken(accessToken, accessSecretKey);
@@ -194,7 +187,6 @@ public class JwtProvider {
      * Validates the given refresh token.
      *
      * @param refreshToken the JWT refresh token to validate.
-     * @return true if the refresh token is valid, false otherwise.
      */
     public boolean validateRefreshToken(@NonNull String refreshToken){
         return validateToken(refreshToken, refreshSecretKey);

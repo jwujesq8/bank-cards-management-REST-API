@@ -23,7 +23,6 @@ public class UserServiceImpl implements UserService {
      * Retrieves a user by their email.
      *
      * @param login The email of the user to retrieve.
-     * @return An {@link Optional} containing the {@link User} if found, or an empty {@link Optional} if not found.
      */
     @Override
     public Optional<User> getUserByEmail(String login) {

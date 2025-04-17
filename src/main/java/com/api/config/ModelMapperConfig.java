@@ -10,9 +10,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Class ModelMapperConfig
+ *
+ * Configuration class for creating and setting up a ModelMapper bean.
+ * Defines custom mappings between Card entity and its DTOs.
+ */
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
@@ -20,12 +24,10 @@ public class ModelMapperConfig {
 
     private final EncryptionUtil encryptionUtil;
 
+
     /**
-     * Creates and returns a {@link ModelMapper} instance as a Spring bean.
-     * This bean is used for mapping between different object types, simplifying the process of converting one object
-     * to another, especially in scenarios like DTOs to entities or vice versa.
-     *
-     * @return a new {@link ModelMapper} instance.
+     * Creates and configures a ModelMapper bean.
+     * Adds custom converter to decrypt and mask card numbers.
      */
     @Bean
     public ModelMapper modelMapper(){
@@ -51,6 +53,11 @@ public class ModelMapperConfig {
         return modelMapper;
     }
 
+    /**
+     * Masks a card number, keeping only the last 4 digits.
+     *
+     * @param number decrypted card number
+     */
     private String mask(String number) {
         if (number == null || number.length() < 4) return "****";
         return "****-****-****-" + number.substring(number.length() - 4);

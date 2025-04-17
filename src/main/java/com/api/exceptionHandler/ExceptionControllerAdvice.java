@@ -36,7 +36,6 @@ public class ExceptionControllerAdvice {
      * Helper method to generate a standardized error response.
      *
      * @param errorMessage The error message to be included in the response.
-     * @return A custom error message DTO.
      * @throws JsonProcessingException if the error message cannot be processed.
      */
     private ErrorMessageResponseDto getResponseBody(String errorMessage) throws JsonProcessingException {
@@ -65,10 +64,10 @@ public class ExceptionControllerAdvice {
     }
 
     /**
-     * Handles AuthException and returns an UNAUTHORIZED response with the error message.
+     * Handles ForbiddenException and returns an FORBIDDEN response with the error message.
      *
-     * @param e The AuthException to be handled.
-     * @return A ResponseEntity with a custom error message and an UNAUTHORIZED status.
+     * @param e The ForbiddenException to be handled.
+     * @return A ResponseEntity with a custom error message and an FORBIDDEN status.
      * @throws JsonProcessingException if the error message cannot be processed.
      */
     @ExceptionHandler(ForbiddenException.class)
@@ -116,6 +115,14 @@ public class ExceptionControllerAdvice {
                 .body(getResponseBody(e.getMessage()));
     }
 
+    /**
+     * Handles HttpMessageNotReadableException which occurs when the request body is not readable or is invalid.
+     * This is typically thrown when the request body cannot be parsed into the expected Java object.
+     * The exception is logged, and an appropriate error message is returned to the client.
+     *
+     * @param e The exception that was thrown, containing details about the error.
+     * @return A `ResponseEntity` containing an `ErrorMessageResponseDto` with the error details.
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorMessageResponseDto> handleHttpMessageNotReadable(HttpMessageNotReadableException e) throws JsonProcessingException {
 

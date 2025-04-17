@@ -39,7 +39,6 @@ public class SecurityConfig {
      * - Configures CORS settings for handling cross-origin requests.
      *
      * @param http the HttpSecurity object used to customize the security settings.
-     * @return a configured SecurityFilterChain.
      * @throws Exception if an error occurs during configuration.
      */
         @Bean
@@ -65,8 +64,6 @@ public class SecurityConfig {
      * Configures the CORS (Cross-Origin Resource Sharing) settings for the application.
      * This method sets the allowed origins, HTTP methods, headers, and credentials for cross-origin requests.
      * It allows requests from any origin and supports common HTTP methods like GET, POST, PUT, and DELETE.
-     *
-     * @return a CorsConfigurationSource object with the configured CORS settings.
      */
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

@@ -1,14 +1,12 @@
 package com.api.service;
 
 import com.api.config.EncryptionUtil;
-import com.api.config.enums.CardStatus;
 import com.api.dto.CardDto;
 import com.api.dto.CardDtoNoId;
 import com.api.entity.Card;
 import com.api.exception.BadRequestException;
 import com.api.repository.CardRepository;
 import com.api.service.interfaces.CardService;
-import com.api.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -17,10 +15,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Class CardServiceImpl
+ *
+ * Service implementation for managing cards.
+ * Provides methods for adding, updating, deleting, and retrieving card information.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,8 +34,9 @@ public class CardServiceImpl implements CardService {
     private final EncryptionUtil encryptionUtils;
 
     /**
-     * @param cardId
-     * @return
+     * Retrieves a card by its ID.
+     *
+     * @param cardId The ID of the card to be retrieved.
      */
     @Override
     public CardDto getCardById(UUID cardId) {
@@ -40,8 +44,10 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * @param cardDtoNoId
-     * @return
+     * Adds a new card.
+     *
+     * @param cardDtoNoId The card details without the ID.
+     * @throws BadRequestException if there is a data integrity violation while saving the card.
      */
     @Override
     public CardDto addCard(CardDtoNoId cardDtoNoId) {
@@ -55,8 +61,9 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * @param cardDto
-     * @return
+     * Updates an existing card.
+     *
+     * @param cardDto The updated card details.
      */
     @Override
     public CardDto updateCard(CardDto cardDto) {
@@ -66,9 +73,10 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * @param cardId
-     * @param newStatus
-     * @return
+     * Updates the status of a card.
+     *
+     * @param cardId    The ID of the card to update.
+     * @param newStatus The new status to be set.
      */
     @Transactional
     @Override
@@ -77,9 +85,10 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * @param cardId
-     * @param newLimit
-     * @return
+     * Updates the transaction limit per day for a card.
+     *
+     * @param cardId     The ID of the card.
+     * @param newLimit   The new transaction limit per day to be set.
      */
     @Transactional
     @Override
@@ -88,7 +97,9 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * @param cardId
+     * Deletes a card by its ID.
+     *
+     * @param cardId The ID of the card to be deleted.
      */
     @Override
     public void deleteCardById(UUID cardId) {
@@ -96,8 +107,9 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * @param pageable
-     * @return
+     * Retrieves all cards with pagination.
+     *
+     * @param pageable Pagination information.
      */
     @Override
     public Page<CardDto> findAll(Pageable pageable) {
@@ -105,8 +117,11 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * @param ownerId
-     * @return
+     * Retrieves all cards by the owner's ID with pagination.
+     *
+     * @param ownerId The ID of the card's owner.
+     * @param pageable Pagination information.
+     * @return A {@link Page} of {@link CardDto} objects representing the cards owned by the specified owner.
      */
     @Override
     public Page<CardDto> findAllByOwnerId(UUID ownerId, Pageable pageable) {

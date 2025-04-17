@@ -41,7 +41,6 @@ public class AuthServiceImpl {
      * Handles user login by verifying the email and password, generating an access token, and storing a refresh token.
      *
      * @param jwtRequestDto Contains email and password for authentication.
-     * @return A {@link JwtResponseDto} containing the generated access and refresh tokens.
      * @throws BadRequestException If the user is not found.
      * @throws ForbiddenException If the password is incorrect.
      * @throws OkException If the user is already logged in.
@@ -71,7 +70,6 @@ public class AuthServiceImpl {
      * Generates a new access token for a user based on a valid refresh token.
      *
      * @param refreshToken The refresh token to validate and use for generating a new access token.
-     * @return A {@link JwtResponseDto} containing the new access token.
      * @throws ForbiddenException If the refresh token is invalid or expired.
      */
     public JwtResponseDto getNewAccessToken(@NotNull String refreshToken){
@@ -98,7 +96,6 @@ public class AuthServiceImpl {
      * Refreshes both the access token and refresh token for the user.
      *
      * @param refreshToken The refresh token to validate and use for refreshing both tokens.
-     * @return A {@link JwtResponseDto} containing the new access and refresh tokens.
      * @throws ForbiddenException If the refresh token is invalid or expired.
      */
     public JwtResponseDto refresh(@NotNull String refreshToken){
@@ -152,7 +149,6 @@ public class AuthServiceImpl {
      * Checks if a user is logged in by verifying if their refresh token is stored.
      *
      * @param login The email (login) of the user to check.
-     * @return {@code true} if the user is logged in, {@code false} otherwise.
      */
     public boolean isUserLoggedIn(String login){
         return refreshTokensStorage.containsKey(login);

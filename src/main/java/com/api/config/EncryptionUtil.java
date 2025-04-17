@@ -6,12 +6,33 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
+/**
+ * Class EncryptionUtil
+ *
+ * Utility class for encrypting and decrypting text using AES algorithm.
+ *
+ * <p>This class provides simple AES encryption and decryption using a fixed secret key.
+ */
 @Component
 public class EncryptionUtil {
 
+
+    /**
+     * Secret key used for AES encryption/decryption (must be 16 bytes for AES-128).
+     */
     private static final String SECRET_KEY = "1234567890123456";
+    /**
+     * Encryption algorithm used.
+     */
     private static final String ALGORITHM = "AES";
 
+    /**
+     * Encrypts a plain text string using AES encryption and encodes the result as a Base64 string.
+     *
+     * @param plainText the original plain text to encrypt
+     * @return the encrypted text encoded in Base64
+     * @throws RuntimeException if encryption fails
+     */
     public String encrypt(String plainText){
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -24,6 +45,13 @@ public class EncryptionUtil {
         }
     }
 
+    /**
+     * Decrypts a Base64-encoded encrypted string using AES decryption.
+     *
+     * @param encryptedText the encrypted text in Base64 format
+     * @return the decrypted original plain text
+     * @throws RuntimeException if decryption fails
+     */
     public String decrypt(String encryptedText){
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);

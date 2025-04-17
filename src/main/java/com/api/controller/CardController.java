@@ -19,6 +19,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Class CardController
+ *
+ * Controller for managing card operations in the Bank Cards Management System.
+ * This controller provides endpoints for card-related actions such as adding, updating, retrieving, and deleting cards.
+ * Only authorized users (admin or card owner) can access specific endpoints.
+ */
 @RestController
 @RequestMapping("/card")
 @RequiredArgsConstructor
@@ -28,6 +35,12 @@ public class CardController {
 
     private final CardService cardService;
 
+    /**
+     * Retrieves a card by its ID.
+     * Accessible only by the card owner and admin.
+     *
+     * @param cardIdDto the card ID to be retrieved.
+     */
     @Operation(summary = "get card by id - only for admin and card owner")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = CardDto.class), mediaType = "application/json")),
@@ -40,6 +53,13 @@ public class CardController {
         return ResponseEntity.ok(cardService.getCardById(cardIdDto.getId()));
     }
 
+    /**
+     * Adds a new card to the system.
+     * Accessible only by admin.
+     *
+     * @param cardDtoNoId the DTO containing card data (excluding ID).
+     * @return a {@link ResponseEntity} containing the {@link CardDto} of the newly created card.
+     */
     @Operation(summary = "add a new card - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "New card is created", content = @Content(schema = @Schema(implementation = CardDto.class), mediaType = "application/json")),
@@ -54,6 +74,13 @@ public class CardController {
                 .body(cardService.addCard(cardDtoNoId));
     }
 
+    /**
+     * Updates an existing card in the system.
+     * Accessible only by admin.
+     *
+     * @param cardDto the {@link CardDto} containing the updated card data.
+     * @return a {@link ResponseEntity} containing the updated {@link CardDto}.
+     */
     @Operation(summary = "update card that already exists in the database - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Card is updated", content = @Content(schema = @Schema(implementation = CardDto.class), mediaType = "application/json")),
@@ -66,6 +93,12 @@ public class CardController {
         return ResponseEntity.ok(cardService.updateCard(cardDto));
     }
 
+    /**
+     * Updates the status of a card.
+     * Accessible only by admin.
+     *
+     * @param cardIdStatusDto the DTO containing the card ID and the new status.
+     */
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Card status is updated"),
             @ApiResponse(responseCode = "400", description = "Bad request (non valid data)",  content = @Content(schema = @Schema(implementation = ValidationErrorMessageResponseDto.class))),
@@ -78,6 +111,13 @@ public class CardController {
         cardService.updateCardStatus(cardIdStatusDto.getId(), cardIdStatusDto.getNewStatus().name());
     }
 
+
+    /**
+     * Updates the transaction limit per day of a card.
+     * Accessible only by admin.
+     *
+     * @param cardIdLimitDto the DTO containing the card ID and the new transaction limit.
+     */
     @Operation(summary = "update only cards transaction limit per date - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Cards transaction limit per date is updated"),
@@ -91,6 +131,12 @@ public class CardController {
                 cardIdLimitDto.getNewTransactionLimitPerDay());
     }
 
+    /**
+     * Deletes a card by its ID.
+     * Accessible only by admin.
+     *
+     * @param cardIdDto the DTO containing the ID of the card to be deleted.
+     */
     @Operation(summary = "delete card by id - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Card is deleted or does not exist"),
@@ -102,6 +148,14 @@ public class CardController {
         cardService.deleteCardById(cardIdDto.getId());
     }
 
+    /**
+     * Retrieves all cards in the system (paged).
+     * Accessible only by admin.
+     *
+     * @param page the page number (default is 0).
+     * @param size the number of cards per page (default is 3).
+     * @return a {@link ResponseEntity} containing a page of {@link CardDto}.
+     */
     @Operation(summary = "get all cards (paging) - only for admin")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = CardDto.class))),
@@ -114,6 +168,15 @@ public class CardController {
         return ResponseEntity.ok(cardService.findAll(PageRequest.of(page, size)));
     }
 
+    /**
+     * Retrieves all cards by card owner ID (paged).
+     * Accessible only by admin or the card owner.
+     *
+     * @param ownerIdDto the DTO containing the owner ID.
+     * @param page the page number (default is 0).
+     * @param size the number of cards per page (default is 3).
+     * @return a {@link ResponseEntity} containing a page of {@link CardDto}.
+     */
     @Operation(summary = "get all cards by card owner id (paging) - only for admin and cards owner")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = CardDto.class))),

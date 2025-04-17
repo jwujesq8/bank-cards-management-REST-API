@@ -2,17 +2,22 @@ package com.api.entity;
 
 import com.api.config.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Class User
+ *
+ * Represents a user within the system, implementing the `UserDetails` interface for authentication and authorization.
+ * This entity includes the user's personal information, role, and associated cards.
+ * The `User` class serves as the primary entity for user authentication and is linked to the `Card` entity.
+ */
 @Entity
 @Table(name = "users")
 @AllArgsConstructor
@@ -63,58 +68,36 @@ public class User implements UserDetails {
             cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Card> cards;
 
-
-    /**
-     * @return
-     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(email));
     }
 
-    /**
-     * @return
-     */
     @Override
     public String getPassword() {
         return this.password;
     }
 
-    /**
-     * @return
-     */
     @Override
     public String getUsername() {
         return this.email;
     }
 
-    /**
-     * @return
-     */
     @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();
     }
 
-    /**
-     * @return
-     */
     @Override
     public boolean isAccountNonLocked() {
         return UserDetails.super.isAccountNonLocked();
     }
 
-    /**
-     * @return
-     */
     @Override
     public boolean isCredentialsNonExpired() {
         return UserDetails.super.isCredentialsNonExpired();
     }
 
-    /**
-     * @return
-     */
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();

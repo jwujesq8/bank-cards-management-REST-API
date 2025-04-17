@@ -1,10 +1,10 @@
 package com.api.exception;
 
 /**
- * Class AuthException
+ * Class ForbiddenException
  *
- * Custom exception class for handling authentication errors.
- * This exception is thrown when authentication-related issues occur,
+ * Custom exception class for handling forbidden errors.
+ * This exception is thrown when authentication-related or access issues occur,
  * such as invalid credentials, token errors, or unauthorized access attempts.
  */
 public class ForbiddenException extends RuntimeException{

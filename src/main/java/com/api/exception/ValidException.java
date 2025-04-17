@@ -27,7 +27,6 @@ public class ValidException extends RuntimeException {
     /**
      * Gets the original ConstraintViolationException that contains the validation errors.
      *
-     * @return The ConstraintViolationException instance.
      */
     public ConstraintViolationException getConstraintViolationException() {
         return constraintViolationException;

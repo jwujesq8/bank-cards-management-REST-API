@@ -41,7 +41,6 @@ public class AuthController {
      * Authenticates the user and returns a JWT access token.
      *
      * @param JwtRequestDto The request body containing user login credentials.
-     * @return {@link JwtResponseDto} containing the JWT access token.
      * @throws ConstraintViolationException if the request body validation fails.
      */
     @Operation(summary = "log in")
@@ -61,7 +60,6 @@ public class AuthController {
      * After the new access token is obtained, the used refresh token becomes invalid.
      *
      * @param RefreshJwtRequestDto The request body containing the refresh token.
-     * @return {@link JwtResponseDto} containing the new access token.
      */
     @Operation(summary = "get new access token (AFTER THAT USED REFRESH TOKEN WILL BE NON VALID)")
     @PostMapping("/newAccessToken")
@@ -79,7 +77,6 @@ public class AuthController {
      * Endpoint to refresh both the access and refresh tokens.
      *
      * @param RefreshJwtRequestDto The request body containing the refresh token.
-     * @return {@link JwtResponseDto} containing the new access token and refresh token.
      */
     @Operation(summary = "get new access and refresh token")
     @PostMapping("/refreshToken")
