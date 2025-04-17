@@ -34,12 +34,13 @@ public class EncryptionUtil {
 
     /**
      * Constructor for EncryptionUtil.
+     *
      * Read secret key from a filepath that is defined in the application.properties
      */
     public EncryptionUtil(
             @Value("${secret.key.path}") String secretKeyPath
     ) throws IOException {
-        // SECRET KEY
+        // read SECRET_KEY
         Path s = Paths.get(secretKeyPath).toAbsolutePath().normalize();
         if (Files.exists(s)) {
             SECRET_KEY = new String(Files.readAllBytes(s));
@@ -47,8 +48,6 @@ public class EncryptionUtil {
             throw new IOException("Access file not found: " + secretKeyPath.toString());
         }
     }
-
-
 
     /**
      * Encrypts a plain text string using AES encryption and encodes the result as a Base64 string.
