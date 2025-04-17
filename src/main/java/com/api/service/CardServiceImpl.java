@@ -1,6 +1,7 @@
 package com.api.service;
 
 import com.api.config.EncryptionUtil;
+import com.api.config.enums.CardStatus;
 import com.api.dto.CardDto;
 import com.api.dto.CardDtoNoId;
 import com.api.entity.Card;
@@ -61,19 +62,24 @@ public class CardServiceImpl implements CardService {
     }
 
     /**
-     * Updates an existing card.
+     * Updates an existing card (if not expired).
      *
      * @param cardDto The updated card details.
      */
     @Override
     public CardDto updateCard(CardDto cardDto) {
+        Card cardDb = cardRepository.findById(cardDto.getId()).orElseThrow(() ->
+                new BadRequestException("There is no such card"));
+        if(cardDb.getStatus().equals(CardStatus.expired) || cardDb.getStatus().equals(CardStatus.blocked)){
+            throw new BadRequestException("The card can only be changed if the card has not expired or blocked status");
+        }
         cardDto.setNumber(encryptionUtils.encrypt(cardDto.getNumber()));
         Card card = cardRepository.save(modelMapper.map(cardDto, Card.class));
         return modelMapper.map(card, CardDto.class);
     }
 
     /**
-     * Updates the status of a card.
+     * Updates the status of a card (if not expired).
      *
      * @param cardId    The ID of the card to update.
      * @param newStatus The new status to be set.
@@ -81,11 +87,16 @@ public class CardServiceImpl implements CardService {
     @Transactional
     @Override
     public void updateCardStatus(UUID cardId, String newStatus) {
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new BadRequestException("There is no such card"));
+        // check if prev card status is not expired
+        if (card.getStatus().equals(CardStatus.expired)){
+            throw new BadRequestException("The card status can only be changed if the card has not expired");
+        }
         cardRepository.updateStatus(cardId, newStatus);
     }
 
     /**
-     * Updates the transaction limit per day for a card.
+     * Updates the transaction limit per day for a card (if not expired or blocked).
      *
      * @param cardId     The ID of the card.
      * @param newLimit   The new transaction limit per day to be set.
@@ -93,11 +104,17 @@ public class CardServiceImpl implements CardService {
     @Transactional
     @Override
     public void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit) {
+        Card cardDb = cardRepository.findById(cardId).orElseThrow(() ->
+                new BadRequestException("There is no such card"));
+        if(cardDb.getStatus().equals(CardStatus.expired) || cardDb.getStatus().equals(CardStatus.blocked)){
+            throw new BadRequestException("The card can only be changed if the card has not expired or blocked status");
+        }
         cardRepository.updateTransactionLimitPerDayById(cardId, newLimit);
     }
 
     /**
      * Deletes a card by its ID.
+     * A card can only be deleted if there are no transactions where it is either the source or the destination.
      *
      * @param cardId The ID of the card to be deleted.
      */
