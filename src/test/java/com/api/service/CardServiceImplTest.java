@@ -157,6 +157,7 @@ class CardServiceImplTest {
         @Test
         public void shouldEncryptAndUpdateCard() {
             when(encryptionUtils.encrypt(anyString())).thenReturn("encrypted");
+            when(cardRepository.findById(cardId)).thenReturn(Optional.of(userCard));
             when(cardRepository.save(any())).thenReturn(userCard);
 
             CardDto result = cardService.updateCard(userCardDto);
@@ -171,6 +172,7 @@ class CardServiceImplTest {
 
         @Test
         public void shouldCallRepository(){
+            when(cardRepository.findById(cardId)).thenReturn(Optional.of(userCard));
             cardService.updateCardStatus(cardId, "expired");
             verify(cardRepository).updateStatus(cardId, "expired");
         }
@@ -182,6 +184,7 @@ class CardServiceImplTest {
         @Test
         public void shouldCallRepository(){
             BigDecimal newLimit = BigDecimal.valueOf(1000);
+            when(cardRepository.findById(cardId)).thenReturn(Optional.of(userCard));
 
             cardService.updateCardsTransactionLimitPerDayById(cardId, newLimit);
 
