@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -115,16 +116,16 @@ public class ExceptionControllerAdvice {
                 .body(getResponseBody(e.getMessage()));
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ErrorMessageResponseDto> unexpectedExceptionHandler(
-//            Exception e) throws JsonProcessingException{
-//
-//        log.error("Exception: unexpectedException. " +
-//                "Exception message: " + e.getMessage());
-//        return ResponseEntity
-//                .status(HttpStatus.FORBIDDEN)
-//                .body(getResponseBody(e.getMessage()));
-//    }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorMessageResponseDto> handleHttpMessageNotReadable(HttpMessageNotReadableException e) throws JsonProcessingException {
+
+        log.error("Exception: HttpMessageNotReadableException. " +
+                "Exception message: " + e.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(getResponseBody("Invalid request body: " + e.getMostSpecificCause().getMessage()));
+    }
 
     /**
      * Handles ValidException and returns a BAD_REQUEST response with the error message.

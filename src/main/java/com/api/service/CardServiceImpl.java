@@ -84,7 +84,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     @Override
     public void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit) {
-        cardRepository.updateTransactionLimitPerDayById(cardId, newLimit); // отношения cards не существует??
+        cardRepository.updateTransactionLimitPerDayById(cardId, newLimit);
     }
 
     /**

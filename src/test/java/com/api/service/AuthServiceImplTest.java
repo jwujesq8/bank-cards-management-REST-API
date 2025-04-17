@@ -176,8 +176,8 @@ class AuthServiceImplTest {
             when(userService.getUserByEmail("user@gmail.com")).thenReturn(Optional.of(user));
             authService.getRefreshTokensStorage().put(user.getEmail(), "refreshToken");
 
-            authService.logout("refreshToken"); // first logout
-            assertThrows(OkException.class, () -> authService.logout("refreshToken"));
+            authService.logout("refreshToken"); // the first logout
+            assertThrows(OkException.class, () -> authService.logout("refreshToken")); // the second logout
         }
     }
 

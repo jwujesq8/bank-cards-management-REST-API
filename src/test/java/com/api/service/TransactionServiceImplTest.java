@@ -232,7 +232,7 @@ class TransactionServiceImplTest {
             assertThrows(BadRequestException.class, () -> transactionService.makeTransaction(sourceCardId, destinationCardId, new BigDecimal("1500.00")));
         }
 
-        @Test // todo
+        @Test
         public void exceededLimit_shouldThrowException(){
             BigDecimal spentToday = new BigDecimal("200.00");
             Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
