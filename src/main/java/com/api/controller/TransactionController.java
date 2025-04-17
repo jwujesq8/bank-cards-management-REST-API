@@ -138,7 +138,7 @@ public class TransactionController {
      */
     @Operation(summary = "get all transactions (paging) - only for admin")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "200", description = "Success",  content = @Content(schema = @Schema(implementation = TransactionDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
     )
     @GetMapping("/all")

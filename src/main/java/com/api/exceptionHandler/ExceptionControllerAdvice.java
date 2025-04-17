@@ -6,6 +6,7 @@ import com.api.exception.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -39,7 +41,6 @@ public class ExceptionControllerAdvice {
      * @throws JsonProcessingException if the error message cannot be processed.
      */
     private ErrorMessageResponseDto getResponseBody(String errorMessage) throws JsonProcessingException {
-
         return ErrorMessageResponseDto.builder()
                 .dateTime("UTC: " + formatter.format(Instant.now().atZone(ZoneId.of("UTC"))))
                 .description(errorMessage)
@@ -54,8 +55,8 @@ public class ExceptionControllerAdvice {
      * @throws JsonProcessingException if the error message cannot be processed.
      */
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorMessageResponseDto> badRequestExceptionHandler(BadRequestException e) throws JsonProcessingException {
-
+    public ResponseEntity<ErrorMessageResponseDto> badRequestExceptionHandler(BadRequestException e)
+            throws JsonProcessingException {
         log.error("Exception: BadRequestException. " +
                 "Exception message: " + e.getMessage());
         return ResponseEntity
@@ -71,11 +72,10 @@ public class ExceptionControllerAdvice {
      * @throws JsonProcessingException if the error message cannot be processed.
      */
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ErrorMessageResponseDto> authExceptionHandler(ForbiddenException e) throws JsonProcessingException {
-
+    public ResponseEntity<ErrorMessageResponseDto> authExceptionHandler(ForbiddenException e)
+            throws JsonProcessingException {
         log.error("Exception: ForbiddenException. " +
                 "Exception message: " + e.getMessage());
-
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(getResponseBody(e.getMessage()));
@@ -90,7 +90,6 @@ public class ExceptionControllerAdvice {
      */
     @ExceptionHandler(OkException.class)
     public ResponseEntity<ErrorMessageResponseDto> okExceptionHandler(OkException e) throws JsonProcessingException{
-
         log.error("Exception: OkException. " +
                 "Exception message: " + e.getMessage());
         return ResponseEntity
@@ -107,7 +106,6 @@ public class ExceptionControllerAdvice {
      */
     @ExceptionHandler(ServerException.class)
     public ResponseEntity<ErrorMessageResponseDto> serverExceptionHandler(ServerException e) throws JsonProcessingException{
-
         log.error("Exception: ServerException. " +
                 "Exception message: " + e.getMessage());
         return ResponseEntity
@@ -124,11 +122,10 @@ public class ExceptionControllerAdvice {
      * @return A `ResponseEntity` containing an `ErrorMessageResponseDto` with the error details.
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorMessageResponseDto> handleHttpMessageNotReadable(HttpMessageNotReadableException e) throws JsonProcessingException {
-
+    public ResponseEntity<ErrorMessageResponseDto> handleHttpMessageNotReadable(HttpMessageNotReadableException e)
+            throws JsonProcessingException {
         log.error("Exception: HttpMessageNotReadableException. " +
                 "Exception message: " + e.getMessage());
-
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(getResponseBody("Invalid request body: " + e.getMostSpecificCause().getMessage()));
@@ -144,13 +141,29 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler(ValidException.class)
     public ResponseEntity<ErrorMessageResponseDto> validationExceptionHandler(
             ValidException e) throws JsonProcessingException{
-
         log.error("Exception: ValidException. " +
                 "Exception message: " + e.getMessage());
-
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(getResponseBody(e.getMessage()));
+    }
+
+    /**
+     * Handles DataIntegrityViolationException which occurs when a database integrity constraint is violated,
+     * such as a foreign key or unique constraint.
+
+     * @param ex the DataIntegrityViolationException thrown during request processing
+     * @return a ResponseEntity containing an ErrorMessageResponseDto and HTTP status {@code 409 Conflict}
+     * @throws JsonProcessingException if an error occurs while serializing the error message response
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorMessageResponseDto> handleDataIntegrityViolation(DataIntegrityViolationException ex)
+            throws JsonProcessingException {
+        log.error("Exception: DataIntegrityViolationException. " +
+                "Exception message: " + ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(getResponseBody(ex.getMessage()));
     }
 
     /**
@@ -164,7 +177,6 @@ public class ExceptionControllerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorMessageResponseDto> validationExceptionHandler(
             MethodArgumentNotValidException e) throws JsonProcessingException {
-
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName;
@@ -177,20 +189,14 @@ public class ExceptionControllerAdvice {
             }
             errors.put(fieldName, errorMessage);
         });
-
         ValidationErrorMessageResponseDto validErrorMessageResponseDto = ValidationErrorMessageResponseDto.builder()
                 .dateTime("UTC: " + formatter.format(Instant.now().atZone(ZoneId.of("UTC"))))
                 .errorsMap(errors)
                 .build();
-
         log.error("Exception: MethodArgumentNotValidException. " +
                 "Exception message: " + errors);
-
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(validErrorMessageResponseDto);
     }
-
 }
-
-

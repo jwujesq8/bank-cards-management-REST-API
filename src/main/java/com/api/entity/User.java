@@ -64,10 +64,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY,
-            cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Card> cards;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(email));
