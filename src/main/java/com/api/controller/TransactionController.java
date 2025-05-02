@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * It provides endpoints for adding, updating, deleting, and retrieving transactions, with appropriate authorization checks.
  */
 @RestController
-@RequestMapping("/transaction")
+@RequestMapping("/transactions")
 @RequiredArgsConstructor
 @Validated
 @Tag(name="Transaction controller", description="Manipulations with users cards transactions")

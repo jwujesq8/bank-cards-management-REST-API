@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * It provides endpoints for adding, updating, deleting, and retrieving users, with appropriate authorization checks.
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Validated
 @Tag(name="User controller", description="Manipulations with users and their info")

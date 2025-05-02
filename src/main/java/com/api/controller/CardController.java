@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
  * Only authorized users (admin or card owner) can access specific endpoints.
  */
 @RestController
-@RequestMapping("/card")
+@RequestMapping("/cards")
 @RequiredArgsConstructor
 @Validated
 @Tag(name="Card controller", description="Manipulations with users cards")
@@ -105,7 +105,7 @@ public class CardController {
             @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
     )
     @Operation(summary = "update only cards status - only for admin")
-    @PutMapping("/status")
+    @PatchMapping("/status")
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
     public void updateCardStatus(@RequestBody @Valid CardIdStatusDto cardIdStatusDto){
         cardService.updateCardStatus(cardIdStatusDto.getId(), cardIdStatusDto.getNewStatus().name());
@@ -124,7 +124,7 @@ public class CardController {
             @ApiResponse(responseCode = "400", description = "Bad request (non valid data)",  content = @Content(schema = @Schema(implementation = ValidationErrorMessageResponseDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
     )
-    @PutMapping("/transactionLimitPerDay")
+    @PatchMapping("/transactionLimitPerDay")
     @PreAuthorize("isAuthenticated() && hasRole('ADMIN')")
     public void updateCardsTransactionLimitPerDayById(@RequestBody @Valid CardIdLimitDto cardIdLimitDto){
         cardService.updateCardsTransactionLimitPerDayById(cardIdLimitDto.getId(),
