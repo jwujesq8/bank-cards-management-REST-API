@@ -3,6 +3,8 @@ package com.api.config;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
@@ -38,12 +40,14 @@ public class EncryptionUtil {
      * Read secret key from a filepath that is defined in the application.properties
      */
     public EncryptionUtil(
-            @Value("${secret.key.path}") String secretKeyPath
+            @Value("${secret.key.path}") String secretKeyPath,
+            ResourceLoader resourceLoader
     ) throws IOException {
-        // read SECRET_KEY
-        Path s = Paths.get(secretKeyPath).toAbsolutePath().normalize();
-        if (Files.exists(s)) {
-            SECRET_KEY = new String(Files.readAllBytes(s));
+
+        // SECRET_KEY
+        Resource secretResource = resourceLoader.getResource(secretKeyPath);
+        if (secretResource.exists()) {
+            SECRET_KEY = new String(secretResource.getInputStream().readAllBytes());
         } else {
             throw new IOException("Access file not found: " + secretKeyPath.toString());
         }

@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -44,27 +46,27 @@ public class JwtProvider {
      */
     public JwtProvider(
             @Value("${jwt.access.path}") String accessPath,
-            @Value("${jwt.refresh.path}") String refreshPath
+            @Value("${jwt.refresh.path}") String refreshPath,
+            ResourceLoader resourceLoader
     ) throws IOException {
 
         // ACCESS TOKEN
-        Path a = Paths.get(accessPath).toAbsolutePath().normalize();
-        if (Files.exists(a)) {
-            String access = new String(Files.readAllBytes(a));
+        Resource accessResource = resourceLoader.getResource(accessPath);
+        if (accessResource.exists()) {
+            String access = new String(accessResource.getInputStream().readAllBytes());
             accessSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(access));
         } else {
-            throw new IOException("Access file not found: " + accessPath.toString());
+            throw new IOException("Access file not found: " + accessPath);
         }
 
         // REFRESH TOKEN
-        Path r = Paths.get(refreshPath).toAbsolutePath().normalize();
-        if (Files.exists(r)) {
-            String refresh = new String(Files.readAllBytes(r));
+        Resource refreshResource = resourceLoader.getResource(refreshPath);
+        if (refreshResource.exists()) {
+            String refresh = new String(refreshResource.getInputStream().readAllBytes());
             refreshSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refresh));
         } else {
-            throw new IOException("Refresh file not found: " + accessPath.toString());
+            throw new IOException("Refresh file not found: " + refreshPath);
         }
-
     }
 
     /**
