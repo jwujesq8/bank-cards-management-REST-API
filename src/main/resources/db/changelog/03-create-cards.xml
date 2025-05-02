@@ -1,0 +1,48 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="3" author="jwujesq8">
+        <preConditions onFail="HALT">
+            <not>
+                <tableExists tableName="cards"/>
+            </not>
+        </preConditions>
+        <createTable tableName="cards">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="number" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="owner_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="timestamp(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="numeric(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transaction_limit_per_day" type="numeric(10,2)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" author="jwujesq8">
+        <preConditions onFail="HALT">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="cards_users_fk"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="cards"
+                                 baseColumnNames="owner_id"
+                                 constraintName="cards_users_fk"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

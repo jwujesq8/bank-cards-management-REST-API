@@ -1,106 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-    <!-- create schema if not exists -->
-    <changeSet id="1" author="jwujesq8">
-        <sql>
-            CREATE SCHEMA IF NOT EXISTS "bank-cards-management";
-        </sql>
-    </changeSet>
-
-    <!-- create 'users' table -->
-    <changeSet id="2" author="jwujesq8">
-        <createTable tableName="users">
-            <column name="id" type="uuid">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="full_name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="email" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="password" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="role" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-
-    <!-- create 'cards' table -->
-    <changeSet id="3" author="jwujesq8">
-        <createTable tableName="cards">
-            <column name="id" type="uuid">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="number" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="owner_id" type="uuid">
-                <constraints nullable="false"/>
-            </column>
-            <column name="expiration_date" type="timestamp(6)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="status" type="varchar(20)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="balance" type="numeric(10,2)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="transaction_limit_per_day" type="numeric(10,2)"/>
-        </createTable>
-    </changeSet>
-
-    <!-- add foreign key constraint to 'cards' -->
-    <changeSet id="4" author="jwujesq8">
-        <addForeignKeyConstraint baseTableName="cards"
-                                 baseColumnNames="owner_id"
-                                 constraintName="cards_users_fk"
-                                 referencedTableName="users"
-                                 referencedColumnNames="id"/>
-    </changeSet>
-
-    <!-- create 'transactions' table -->
-    <changeSet id="5" author="jwujesq8">
-        <createTable tableName="transactions">
-            <column name="id" type="uuid">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="source_card_id" type="uuid">
-                <constraints nullable="false"/>
-            </column>
-            <column name="destination_card_id" type="uuid">
-                <constraints nullable="false"/>
-            </column>
-            <column name="local_date_time" type="timestamp(6)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="amount" type="numeric(10,2)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-
-    <!-- Add foreign key constraints to 'transactions' -->
-    <changeSet id="6" author="jwujesq8">
-        <addForeignKeyConstraint baseTableName="transactions"
-                                 baseColumnNames="source_card_id"
-                                 constraintName="transactions_source_cards_fk"
-                                 referencedTableName="cards"
-                                 referencedColumnNames="id"/>
-        <addForeignKeyConstraint baseTableName="transactions"
-                                 baseColumnNames="destination_card_id"
-                                 constraintName="transactions_destination_cards_fk"
-                                 referencedTableName="cards"
-                                 referencedColumnNames="id"/>
-    </changeSet>
+    <include file="01-init-schema.xml" relativeToChangelogFile="true"/>
+    <include file="02-create-users.xml" relativeToChangelogFile="true"/>
+    <include file="03-create-cards.xml" relativeToChangelogFile="true"/>
+    <include file="04-create-transactions.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

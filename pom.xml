@@ -145,6 +145,19 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>4.27.0</version>
+				<configuration>
+					<url>jdbc:postgresql://localhost:5432/rest-api</url>
+					<schemas>bank_cards_management</schemas>
+					<username>postgres</username>
+					<password>12345</password>
+					<driver>org.postgresql.Driver</driver>
+					<changeLogFile>src/main/resources/db/changelog/db.changelog-master.xml</changeLogFile>
+				</configuration>
+			</plugin>
 		</plugins>
 		<finalName>bank-cards-management-api</finalName>
 	</build>

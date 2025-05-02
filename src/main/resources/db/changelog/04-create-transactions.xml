@@ -1,0 +1,57 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="5" author="jwujesq8">
+        <preConditions onFail="HALT">
+            <not>
+                <tableExists tableName="transactions"/>
+            </not>
+        </preConditions>
+        <createTable tableName="transactions">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="source_card_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="destination_card_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="local_date_time" type="timestamp(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="numeric(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="6" author="jwujesq8">
+        <preConditions onFail="HALT">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="transactions_source_cards_fk"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="transactions"
+                                 baseColumnNames="source_card_id"
+                                 constraintName="transactions_source_cards_fk"
+                                 referencedTableName="cards"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="7" author="jwujesq8">
+        <preConditions onFail="HALT">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="transactions_destination_cards_fk"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="transactions"
+                                 baseColumnNames="destination_card_id"
+                                 constraintName="transactions_destination_cards_fk"
+                                 referencedTableName="cards"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
