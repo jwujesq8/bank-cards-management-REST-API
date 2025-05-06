@@ -52,10 +52,10 @@ class AuthServiceImplTest {
     }
 
     @Nested
-    class loginTest{
+    class login {
 
         @Test
-        public void successfulLogin() {
+        public void success() {
 
             when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
             when(jwtProvider.generateAccessToken(user)).thenReturn("accessToken");
@@ -72,13 +72,13 @@ class AuthServiceImplTest {
         }
 
         @Test()
-        public void userNotFound() {
+        public void userNotFound_shouldThrowException() {
             when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.empty());
             assertThrows(BadRequestException.class, () -> authService.login(jwtRequestDto));
         }
 
         @Test()
-        public void wrongPassword() {
+        public void wrongPassword_shouldThrowException() {
             when(userService.getUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
             assertThrows(BadRequestException.class, () -> authService.login(
@@ -107,7 +107,7 @@ class AuthServiceImplTest {
         }
 
         @Test()
-        public void invalidRefreshToken() {
+        public void invalidRefreshToken_shouldThrowException() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
             assertThrows(ForbiddenException.class, () -> authService.getNewAccessToken("invalidToken"));
         }
@@ -136,7 +136,7 @@ class AuthServiceImplTest {
         }
 
         @Test()
-        public void invalidRefreshToken() {
+        public void invalidRefreshToken_shouldThrowException() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
             assertThrows(ForbiddenException.class, () -> authService.refresh("invalidToken"));
         }
@@ -161,14 +161,14 @@ class AuthServiceImplTest {
         }
 
         @Test()
-        public void invalidRefreshToken() {
+        public void invalidRefreshToken_shouldThrowException() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
 
             assertThrows(ForbiddenException.class, () -> authService.logout("invalidToken"));
         }
 
         @Test()
-        public void alreadyLoggedOut() {
+        public void secondLogOut_shouldThrowException() {
             when(jwtProvider.validateRefreshToken("refreshToken")).thenReturn(true);
             Claims claims = mock(Claims.class);
             when(claims.getSubject()).thenReturn("user@gmail.com");

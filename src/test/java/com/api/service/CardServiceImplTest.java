@@ -16,18 +16,13 @@ import org.junit.jupiter.api.Nested;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -143,7 +138,7 @@ class CardServiceImplTest {
         }
 
         @Test
-        public void shouldThrowBadRequestException_onDuplicate(){
+        public void onDuplicate_shouldThrowBadRequestException(){
             when(encryptionUtils.encrypt(anyString())).thenReturn("encrypted");
             when(cardRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
 

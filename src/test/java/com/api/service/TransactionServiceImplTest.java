@@ -222,7 +222,7 @@ class TransactionServiceImplTest {
         }
 
         @Test
-        public void notSufficientFunds_shouldThrowException(){
+        public void insufficientFunds_shouldThrowException(){
             Card sourceCard = modelMapper.map(sourceCardDto, Card.class);
             Card destinationCard = modelMapper.map(destinationCardDto, Card.class);
 
