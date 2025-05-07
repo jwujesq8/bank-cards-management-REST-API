@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +45,12 @@ import static org.mockito.Mockito.when;
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CardControllerTest {
+
+    record InvalidDtoCase(String name, Object dto) {
+        @Override
+        public String toString() {
+            return name;
+        }}
 
     @LocalServerPort
     private int port;
@@ -192,9 +200,69 @@ class CardControllerTest {
 
     @Nested
     class addCard{
-        // TODO: @ParameterizedTest with @MethodSource("")
-        void invalidDto_shouldThrow400(){
+        private static Stream<Arguments> invalidPostCardDtos() {
+            return Stream.of(
+                    Arguments.of(new InvalidDtoCase(
+                            "number - out of pattern | owner - null",
+                            CardDtoNoId.builder()
+                                    .number("dkkf-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(55.25))
+                                    .status(CardStatus.expired)
+                                    .transactionLimitPerDay(BigDecimal.valueOf(800.00))
+                                    .expirationDate(LocalDateTime.of(2024, 12,12,00,00))
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "number - out of pattern | owner - null",
+                            CardDtoNoId.builder()
+                                    .number("1234-4566-4566-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(55.25))
+                                    .status(CardStatus.expired)
+                                    .transactionLimitPerDay(BigDecimal.valueOf(800.00))
+                                    .expirationDate(LocalDateTime.of(2024, 12,12,00,00))
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "owner - null | balance - minus | transactionLimitPerDay - under 100",
+                            CardDtoNoId.builder()
+                                    .number("1234-4566-4566-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(-55.25))
+                                    .status(CardStatus.active)
+                                    .transactionLimitPerDay(BigDecimal.valueOf(50.00))
+                                    .expirationDate(LocalDateTime.of(2024, 12,12,00,00))
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "owner - null | transactionLimitPerDay - null",
+                            CardDtoNoId.builder()
+                                    .number("1234-4566-4566-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(55.25))
+                                    .status(CardStatus.active)
+                                    .transactionLimitPerDay(null)
+                                    .expirationDate(null)
+                                    .build()
+                    ))
+            );
+        }
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidPostCardDtos")
+        void invalidDto_shouldThrow400(InvalidDtoCase invalidDtoCase){
+            ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
+            when(cardService.addCard(any(CardDtoNoId.class))).thenReturn(cardDto);
 
+            ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
+                    baseUrl() + "/cards/new",
+                    HttpMethod.POST,
+                    getHttpEntity(invalidDtoCase.dto(),
+                            jwtResponseDto.getBody().getAccessToken()),
+                    CardDto.class
+            );
+
+            assertEquals(HttpStatus.BAD_REQUEST, cardResponseEntity.getStatusCode());
         }
         @Test
         void admin_success(){
@@ -258,9 +326,85 @@ class CardControllerTest {
 
     @Nested
     class updateCard {
-        // TODO: @ParameterizedTest with @MethodSource("")
-        void invalidDto_shouldThrow400(){
+        private static Stream<Arguments> invalidPutCardDtos() {
+            return Stream.of(
+                    Arguments.of(new InvalidDtoCase(
+                            "number - out of pattern | owner - null",
+                            CardDto.builder()
+                                    .id(UUID.randomUUID())
+                                    .number("dkkf-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(55.25))
+                                    .status(CardStatus.expired)
+                                    .transactionLimitPerDay(BigDecimal.valueOf(800.00))
+                                    .expirationDate(LocalDateTime.of(2024, 12,12,00,00))
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "number - out of pattern | owner - null",
+                            CardDto.builder()
+                                    .id(UUID.randomUUID())
+                                    .number("1234-4566-4566-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(55.25))
+                                    .status(CardStatus.expired)
+                                    .transactionLimitPerDay(BigDecimal.valueOf(800.00))
+                                    .expirationDate(LocalDateTime.of(2024, 12,12,00,00))
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "owner - null | balance - minus | transactionLimitPerDay - under 100",
+                            CardDto.builder()
+                                    .id(UUID.randomUUID())
+                                    .number("1234-4566-4566-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(-55.25))
+                                    .status(CardStatus.active)
+                                    .transactionLimitPerDay(BigDecimal.valueOf(50.00))
+                                    .expirationDate(LocalDateTime.of(2024, 12,12,00,00))
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "owner - null",
+                            CardDto.builder()
+                                    .id(UUID.randomUUID())
+                                    .number("1234-4566-4566-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(55.25))
+                                    .status(CardStatus.active)
+                                    .transactionLimitPerDay(null)
+                                    .expirationDate(null)
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "id - null | owner - null",
+                            CardDto.builder()
+                                    .id(null)
+                                    .number("1234-4566-4566-4566")
+                                    .owner(null)
+                                    .balance(BigDecimal.valueOf(55.25))
+                                    .status(CardStatus.active)
+                                    .transactionLimitPerDay(BigDecimal.valueOf(850.00))
+                                    .expirationDate(null)
+                                    .build()
+                    ))
+            );
+        }
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidPutCardDtos")
+        void invalidDto_shouldThrow400(InvalidDtoCase invalidDtoCase){
+            ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
+            when(cardService.updateCard(any(CardDto.class))).thenReturn(cardDto);
 
+            ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
+                    baseUrl() + "/cards",
+                    HttpMethod.PUT,
+                    getHttpEntity(invalidDtoCase.dto(),
+                            jwtResponseDto.getBody().getAccessToken()),
+                    CardDto.class
+            );
+
+            assertEquals(HttpStatus.BAD_REQUEST, cardResponseEntity.getStatusCode());
         }
         @Test
         void admin_success(){

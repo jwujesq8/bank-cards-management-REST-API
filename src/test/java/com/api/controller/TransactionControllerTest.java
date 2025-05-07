@@ -1,5 +1,6 @@
 package com.api.controller;
 
+import com.api.config.enums.CardStatus;
 import com.api.dto.*;
 import com.api.dto.jwt.JwtRequestDto;
 import com.api.dto.jwt.JwtResponseDto;
@@ -13,6 +14,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +32,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +42,12 @@ import static org.mockito.Mockito.when;
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TransactionControllerTest {
+
+    record InvalidDtoCase(String name, Object dto) {
+        @Override
+        public String toString() {
+            return name;
+        }}
 
     @LocalServerPort
     private int port;
@@ -57,22 +68,16 @@ class TransactionControllerTest {
 
     private UUID transactionId;
     private TransactionDto transactionDto;
-
     private UUID adminId;
     private UserDto adminDto;
-
     private UUID sourceOwnerId;
     private UserDto sourceOwnerDto;
-
     private UUID nonOwnerId;
     private UserDto nonOwnerDto;
-
     private UUID sourceCardId;
     private CardDto sourceCardDto;
-
     private UUID destinationCardId;
     private CardDto destinationCardDto;
-
     private PaymentDto paymentDto;
 
     String baseUrl() {
@@ -189,6 +194,62 @@ class TransactionControllerTest {
 
     @Nested
     class addTransaction {
+        private static Stream<Arguments> invalidPostTransactionDtos() {
+            return Stream.of(
+                    Arguments.of(new InvalidDtoCase(
+                            "source - null | destination - null",
+                            TransactionDtoNoId.builder()
+                                    .source(null)
+                                    .destination(null)
+                                    .amount(BigDecimal.valueOf(50.00))
+                                    .localDateTime(LocalDateTime.now())
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "source - null | destination - null | amount - minus",
+                            TransactionDtoNoId.builder()
+                                    .source(CardDto.builder().build())
+                                    .destination(null)
+                                    .amount(BigDecimal.valueOf(-5))
+                                    .localDateTime(LocalDateTime.now())
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "source - null | destination - null | amount - null",
+                            TransactionDtoNoId.builder()
+                                    .source(null)
+                                    .destination(null)
+                                    .amount(null)
+                                    .localDateTime(LocalDateTime.now())
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "source - null | destination - null | localDateTime - null",
+                            TransactionDtoNoId.builder()
+                                    .source(null)
+                                    .destination(null)
+                                    .amount(BigDecimal.valueOf(50.00))
+                                    .localDateTime(null)
+                                    .build()
+                    ))
+            );
+        }
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidPostTransactionDtos")
+        void invalidDto_shouldThrow400(InvalidDtoCase invalidDtoCase){
+            ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
+            when(transactionService.addTransaction(any(TransactionDtoNoId.class))).thenReturn(transactionDto);
+
+            ResponseEntity<TransactionDto> cardResponseEntity = restTemplate.exchange(
+                    baseUrl() + "/transactions/new",
+                    HttpMethod.POST,
+                    getHttpEntity(invalidDtoCase.dto(),
+                            jwtResponseDto.getBody().getAccessToken()),
+                    TransactionDto.class
+            );
+
+            assertEquals(HttpStatus.BAD_REQUEST, cardResponseEntity.getStatusCode());
+        }
         @Test
         void admin_success(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
@@ -241,6 +302,66 @@ class TransactionControllerTest {
 
     @Nested
     class updateTransaction {
+        private static Stream<Arguments> invalidPutTransactionDtos() {
+            return Stream.of(
+                    Arguments.of(new InvalidDtoCase(
+                            "id - null | source - null | destination - null",
+                            TransactionDto.builder()
+                                    .id(null)
+                                    .source(null)
+                                    .destination(null)
+                                    .amount(BigDecimal.valueOf(50.00))
+                                    .localDateTime(LocalDateTime.now())
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "source - null | destination - null | amount - minus",
+                            TransactionDto.builder()
+                                    .id(UUID.randomUUID())
+                                    .source(CardDto.builder().build())
+                                    .destination(null)
+                                    .amount(BigDecimal.valueOf(-5))
+                                    .localDateTime(LocalDateTime.now())
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "source - null | destination - null | amount - null",
+                            TransactionDto.builder()
+                                    .id(UUID.randomUUID())
+                                    .source(null)
+                                    .destination(null)
+                                    .amount(null)
+                                    .localDateTime(LocalDateTime.now())
+                                    .build()
+                    )),
+                    Arguments.of(new InvalidDtoCase(
+                            "source - null | destination - null | localDateTime - null",
+                            TransactionDto.builder()
+                                    .id(UUID.randomUUID())
+                                    .source(null)
+                                    .destination(null)
+                                    .amount(BigDecimal.valueOf(50.00))
+                                    .localDateTime(null)
+                                    .build()
+                    ))
+            );
+        }
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("invalidPutTransactionDtos")
+        void invalidDto_shouldThrow400(InvalidDtoCase invalidDtoCase){
+            ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
+            when(transactionService.updateTransaction(any(TransactionDto.class))).thenReturn(transactionDto);
+
+            ResponseEntity<TransactionDto> cardResponseEntity = restTemplate.exchange(
+                    baseUrl() + "/transactions",
+                    HttpMethod.PUT,
+                    getHttpEntity(invalidDtoCase.dto(),
+                            jwtResponseDto.getBody().getAccessToken()),
+                    TransactionDto.class
+            );
+
+            assertEquals(HttpStatus.BAD_REQUEST, cardResponseEntity.getStatusCode());
+        }
         @Test
         void admin_success(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());

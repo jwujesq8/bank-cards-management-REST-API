@@ -89,8 +89,18 @@ public class CardDto {
         this.owner = owner;
         this.expirationDate = expirationDate;
         this.status = status;
-        this.balance = balance.setScale(2, RoundingMode.HALF_UP);
-        this.transactionLimitPerDay = transactionLimitPerDay.setScale(2, RoundingMode.HALF_UP);
-    }
+        if(balance == null){
+            this.balance = BigDecimal.valueOf(0.00);
+        }
+        else{
 
+            this.balance = balance.setScale(2, RoundingMode.HALF_UP);
+        }
+        if(transactionLimitPerDay == null){
+            this.transactionLimitPerDay = BigDecimal.valueOf(100.00);
+        }
+        else {
+            this.transactionLimitPerDay = transactionLimitPerDay.setScale(2, RoundingMode.HALF_UP);
+        }
+    }
 }

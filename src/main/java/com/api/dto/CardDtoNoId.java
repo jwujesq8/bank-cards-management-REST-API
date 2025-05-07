@@ -10,7 +10,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Class CardDtoNoId
@@ -18,7 +20,6 @@ import java.time.LocalDateTime;
  * CardDtoNoId is a Data Transfer Object (DTO) representing a bank card without the ID field.
  * This DTO is used for creating a card where the card ID is generated.
  */
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -72,4 +73,24 @@ public class CardDtoNoId {
     @DecimalMin(value = "100", message = "Min limit is 100")
     @Schema(description = "Card transaction limit per day", example = "1000.00")
     private BigDecimal transactionLimitPerDay;
+
+    public CardDtoNoId(String number, UserDto owner, LocalDateTime expirationDate, CardStatus status, BigDecimal balance, BigDecimal transactionLimitPerDay) {
+        this.number = number;
+        this.owner = owner;
+        this.expirationDate = expirationDate;
+        this.status = status;
+        if(balance == null){
+            this.balance = BigDecimal.valueOf(0.00);
+        }
+        else{
+
+            this.balance = balance.setScale(2, RoundingMode.HALF_UP);
+        }
+        if(transactionLimitPerDay == null){
+            this.transactionLimitPerDay = BigDecimal.valueOf(100.00);
+        }
+        else {
+            this.transactionLimitPerDay = transactionLimitPerDay.setScale(2, RoundingMode.HALF_UP);
+        }
+    }
 }
