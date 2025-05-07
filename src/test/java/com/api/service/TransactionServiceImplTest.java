@@ -42,7 +42,6 @@ class TransactionServiceImplTest {
     private ModelMapper modelMapper;
     TransactionServiceImpl transactionService;
     private UUID transactionId;
-    private TransactionDtoNoId transactionDtoNoId;
     private TransactionDto transactionDto;
     private Transaction transaction;
     private UUID sourceCardId;
@@ -87,12 +86,6 @@ class TransactionServiceImplTest {
                 .transactionLimitPerDay(BigDecimal.valueOf(1000.00))
                 .status(CardStatus.active)
                 .build();
-        transactionDtoNoId = TransactionDtoNoId.builder()
-                .amount(BigDecimal.valueOf(20.00))
-                .source(sourceCardDto)
-                .destination(destinationCardDto)
-                .localDateTime(LocalDateTime.now())
-                .build();
         transactionDto = TransactionDto.builder()
                 .id(transactionId)
                 .amount(BigDecimal.valueOf(20.00))
@@ -123,7 +116,7 @@ class TransactionServiceImplTest {
         @Test
         public void shouldCallRepository(){
             when(transactionRepository.save(any(Transaction.class))).thenReturn(transaction);
-            transactionService.addTransaction(transactionDtoNoId);
+            transactionService.addTransaction(modelMapper.map(transactionDto, TransactionDtoNoId.class));
             verify(transactionRepository).save(any(Transaction.class));
         }
 

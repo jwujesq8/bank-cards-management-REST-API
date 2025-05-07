@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -19,7 +20,6 @@ import java.util.UUID;
  * CardDto is a Data Transfer Object (DTO) that represents a bank card.
  * It includes the card's ID, number, owner, expiration date, status, balance, and transaction limit.
  */
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -82,5 +82,15 @@ public class CardDto {
     @DecimalMin(value = "100", message = "Min limit is 100")
     @Schema(description = "Card transaction limit per day", example = "1000.00")
     private BigDecimal transactionLimitPerDay;
+
+    public CardDto(UUID id, String number, UserDto owner, LocalDateTime expirationDate, CardStatus status, BigDecimal balance, BigDecimal transactionLimitPerDay) {
+        this.id = id;
+        this.number = number;
+        this.owner = owner;
+        this.expirationDate = expirationDate;
+        this.status = status;
+        this.balance = balance.setScale(2, RoundingMode.HALF_UP);
+        this.transactionLimitPerDay = transactionLimitPerDay.setScale(2, RoundingMode.HALF_UP);
+    }
 
 }

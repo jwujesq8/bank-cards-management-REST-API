@@ -7,7 +7,6 @@ import com.api.dto.CardDto;
 import com.api.dto.CardDtoNoId;
 import com.api.dto.UserDto;
 import com.api.entity.Card;
-import com.api.entity.User;
 import com.api.exception.BadRequestException;
 import com.api.repository.CardRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,13 +19,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,11 +43,7 @@ class CardServiceImplTest {
     public UUID cardId;
     public UUID userId;
     public CardDto userCardDto;
-    public CardDtoNoId userCardDtoNoId;
-    public Card userCard;
     public UserDto userDto;
-    public User user;
-
 
     @BeforeEach
     void setUp(){
@@ -66,13 +59,6 @@ class CardServiceImplTest {
                 .password("user_password123")
                 .role(Role.USER)
                 .build();
-        user = User.builder()
-                .id(userId)
-                .fullName("User Fullname")
-                .email("user@gmail.com")
-                .password("user_password123")
-                .role(Role.USER)
-                .build();
         userCardDto = CardDto.builder()
                 .id(cardId)
                 .number("1111-2222-3333-4444")
@@ -82,25 +68,6 @@ class CardServiceImplTest {
                 .transactionLimitPerDay(BigDecimal.valueOf(1000.00))
                 .status(CardStatus.active)
                 .build();
-        userCardDtoNoId = CardDtoNoId.builder()
-                .number("1111-2222-3333-4444")
-                .owner(userDto)
-                .expirationDate(LocalDateTime.of(2026,12,31,00,00,00))
-                .balance(BigDecimal.valueOf(500.00))
-                .transactionLimitPerDay(BigDecimal.valueOf(1000.00))
-                .status(CardStatus.active)
-                .build();
-        userCard = Card.builder()
-                .id(cardId)
-                .number("1111-2222-3333-4444")
-                .owner(user)
-                .expirationDate(LocalDateTime.of(2026,12,31,00,00,00))
-                .balance(BigDecimal.valueOf(500.00))
-                .transactionLimitPerDay(BigDecimal.valueOf(1000.00))
-                .status(CardStatus.active)
-                .build();
-
-
     }
 
     @Nested
@@ -108,7 +75,7 @@ class CardServiceImplTest {
 
         @Test
         public void success(){
-            when(cardRepository.findById(cardId)).thenReturn(Optional.ofNullable(userCard));
+            when(cardRepository.findById(cardId)).thenReturn(Optional.ofNullable(modelMapper.map(userCardDto, Card.class)));
 
             CardDto result = cardService.getCardById(cardId);
 
@@ -127,9 +94,9 @@ class CardServiceImplTest {
         @Test
         public void shouldEncryptAndSaveCard(){
             when(encryptionUtils.encrypt(anyString())).thenReturn("encrypted");
-            when(cardRepository.save(any())).thenReturn(userCard);
+            when(cardRepository.save(any())).thenReturn(modelMapper.map(userCardDto, Card.class));
 
-            CardDto result = cardService.addCard(userCardDtoNoId);
+            CardDto result = cardService.addCard(modelMapper.map(userCardDto, CardDtoNoId.class));
 
             assertNotNull(result);
             assertEquals(userCardDto.getNumber(), result.getNumber());
@@ -142,7 +109,7 @@ class CardServiceImplTest {
             when(encryptionUtils.encrypt(anyString())).thenReturn("encrypted");
             when(cardRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
 
-            assertThrows(BadRequestException.class, () -> cardService.addCard(userCardDtoNoId));
+            assertThrows(BadRequestException.class, () -> cardService.addCard(modelMapper.map(userCardDto, CardDtoNoId.class)));
         }
     }
 
@@ -152,8 +119,8 @@ class CardServiceImplTest {
         @Test
         public void shouldEncryptAndUpdateCard() {
             when(encryptionUtils.encrypt(anyString())).thenReturn("encrypted");
-            when(cardRepository.findById(cardId)).thenReturn(Optional.of(userCard));
-            when(cardRepository.save(any())).thenReturn(userCard);
+            when(cardRepository.findById(cardId)).thenReturn(Optional.of(modelMapper.map(userCardDto, Card.class)));
+            when(cardRepository.save(any())).thenReturn(modelMapper.map(userCardDto, Card.class));
 
             CardDto result = cardService.updateCard(userCardDto);
 
@@ -167,7 +134,7 @@ class CardServiceImplTest {
 
         @Test
         public void shouldCallRepository(){
-            when(cardRepository.findById(cardId)).thenReturn(Optional.of(userCard));
+            when(cardRepository.findById(cardId)).thenReturn(Optional.of(modelMapper.map(userCardDto, Card.class)));
             cardService.updateCardStatus(cardId, "expired");
             verify(cardRepository).updateStatus(cardId, "expired");
         }
@@ -179,7 +146,7 @@ class CardServiceImplTest {
         @Test
         public void shouldCallRepository(){
             BigDecimal newLimit = BigDecimal.valueOf(1000);
-            when(cardRepository.findById(cardId)).thenReturn(Optional.of(userCard));
+            when(cardRepository.findById(cardId)).thenReturn(Optional.of(modelMapper.map(userCardDto, Card.class)));
 
             cardService.updateCardsTransactionLimitPerDayById(cardId, newLimit);
 
@@ -202,7 +169,7 @@ class CardServiceImplTest {
 
         @Test
         public void shouldReturnPageOfCardDto(){
-            List<Card> cards = List.of(userCard);
+            List<Card> cards = List.of(modelMapper.map(userCardDto, Card.class));
             Pageable pageable = PageRequest.of(0, 10);
 
             when(cardRepository.findAll(pageable)).thenReturn(new PageImpl<>(cards));
@@ -219,7 +186,7 @@ class CardServiceImplTest {
             Pageable pageable = PageRequest.of(0, 10);
 
             when(cardRepository.findAllByOwnerId(userId, pageable))
-                    .thenReturn(new PageImpl<>(List.of(userCard)));
+                    .thenReturn(new PageImpl<>(List.of(modelMapper.map(userCardDto, Card.class))));
 
             assertEquals(1, cardService.findAllByOwnerId(userId, pageable).getTotalElements());
         }
