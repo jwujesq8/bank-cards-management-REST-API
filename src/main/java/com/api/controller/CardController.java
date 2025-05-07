@@ -182,7 +182,7 @@ public class CardController {
             @ApiResponse(responseCode = "200", description = "Success", content = @Content(schema = @Schema(implementation = CardDto.class))),
             @ApiResponse(responseCode = "403", description = "Forbidden (non authenticated) or access denied",  content = @Content(mediaType = "none"))}
     )
-    @GetMapping("/all/owner")
+    @PostMapping("/all/owner")
     @PreAuthorize("isAuthenticated() && " +
             "(hasRole('ADMIN') || @permissionChecker.isOwnerRequestToFindAllHisCards(#ownerIdDto, authentication.principal))")
     public ResponseEntity<Page<CardDto>> findAllByOwnerId(@RequestBody @Valid IdDto ownerIdDto,
