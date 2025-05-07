@@ -3,6 +3,7 @@ package com.api.dto.jwt;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 /**
@@ -13,6 +14,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
+@Builder
 public class JwtResponseDto {
 
     /**
