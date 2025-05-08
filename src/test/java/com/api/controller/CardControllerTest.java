@@ -37,7 +37,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -66,7 +65,7 @@ class CardControllerTest {
     @MockBean
     private CardService cardService;
 
-    private WebTestClient webTestClient; // for PATCH requests
+    private WebTestClient webTestClient; // for PATCH requests and JWT exception cases
     private UUID ownerId;
     private UUID nonOwnerId;
     private UUID adminId;
@@ -99,7 +98,7 @@ class CardControllerTest {
 
     @BeforeEach
     void setUp() {
-        this.webTestClient = WebTestClient.bindToServer() // for PATCH requests
+        this.webTestClient = WebTestClient.bindToServer() // for PATCH requests and JWT exception cases
                 .baseUrl(baseUrl())
                 .build();
 
@@ -168,7 +167,7 @@ class CardControllerTest {
 
         }
         @Test
-        void nonOwner_shouldThrow403(){
+        void nonOwner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(nonOwner.getEmail(), nonOwner.getPassword());
 
             ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
@@ -183,17 +182,12 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void unauthenticatedUser_shouldThrow403(){
-            ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
-                    baseUrl() + "/cards",
-                    HttpMethod.POST,
-                    getHttpEntity(
-                            new IdDto(cardId),
-                            null),
-                    CardDto.class
-            );
-
-            assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
+        void unauthenticatedUser_shouldReturn401(){
+            webTestClient.post()
+                    .uri("/cards")
+                    .bodyValue(new IdDto(cardId))
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
     }
 
@@ -249,7 +243,7 @@ class CardControllerTest {
         }
         @ParameterizedTest(name = "{0}")
         @MethodSource("invalidPostCardDtos")
-        void invalidDto_shouldThrow400(InvalidDtoCase invalidDtoCase){
+        void invalidDto_shouldReturn400(InvalidDtoCase invalidDtoCase){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
             when(cardService.addCard(any(CardDtoNoId.class))).thenReturn(cardDto);
 
@@ -281,7 +275,7 @@ class CardControllerTest {
             assertEquals(cardId, cardResponseEntity.getBody().getId());
         }
         @Test
-        void owner_shouldThrow403(){
+        void owner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(ownerDto.getEmail(),ownerDto.getPassword());
 
             ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
@@ -295,7 +289,7 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void nonOwner_shouldThrow403(){
+        void nonOwner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(nonOwner.getEmail(),nonOwner.getPassword());
 
             ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
@@ -309,17 +303,12 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void unauthenticatedUser_shouldThrow403(){
-
-            ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
-                    baseUrl() + "/cards/new",
-                    HttpMethod.POST,
-                    getHttpEntity(modelMapper.map(cardDto,CardDtoNoId.class),
-                            null),
-                    CardDto.class
-            );
-
-            assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
+        void unauthenticatedUser_shouldReturn401(){
+            webTestClient.post()
+                    .uri("/cards/new")
+                    .bodyValue(modelMapper.map(cardDto,CardDtoNoId.class))
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
     }
 
@@ -391,7 +380,7 @@ class CardControllerTest {
         }
         @ParameterizedTest(name = "{0}")
         @MethodSource("invalidPutCardDtos")
-        void invalidDto_shouldThrow400(InvalidDtoCase invalidDtoCase){
+        void invalidDto_shouldReturn400(InvalidDtoCase invalidDtoCase){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
             when(cardService.updateCard(any(CardDto.class))).thenReturn(cardDto);
 
@@ -423,7 +412,7 @@ class CardControllerTest {
             assertEquals(cardId, cardResponseEntity.getBody().getId());
         }
         @Test
-        void owner_shouldThrow403(){
+        void owner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(ownerDto.getEmail(),ownerDto.getPassword());
             when(cardService.updateCard(any(CardDto.class))).thenReturn(cardDto);
 
@@ -438,7 +427,7 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void nonOwner_shouldThrow403(){
+        void nonOwner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(nonOwner.getEmail(),nonOwner.getPassword());
             when(cardService.updateCard(any(CardDto.class))).thenReturn(cardDto);
 
@@ -453,26 +442,18 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void unauthenticatedUser_shouldThrow403(){
-            ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
-                    baseUrl() + "/cards",
-                    HttpMethod.PUT,
-                    getHttpEntity(modelMapper.map(cardDto,CardDto.class),
-                            null),
-                    CardDto.class
-            );
-
-            assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
+        void unauthenticatedUser_shouldReturn401(){
+            webTestClient.put()
+                    .uri("/cards")
+                    .bodyValue(modelMapper.map(cardDto,CardDto.class))
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
 
     }
 
     @Nested
     class updateCardStatus {
-        // TODO: @ParameterizedTest with @MethodSource("")
-        void invalidDto_shouldThrow400(){
-
-        }
         @Test
         void admin_success(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
@@ -486,7 +467,7 @@ class CardControllerTest {
                     .expectStatus().isOk();
         }
         @Test
-        void owner_shouldThrow403(){
+        void owner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(ownerDto.getEmail(),ownerDto.getPassword());
             doNothing().when(cardService).updateCardStatus(any(UUID.class), any(String.class));
 
@@ -498,7 +479,7 @@ class CardControllerTest {
                     .expectStatus().isForbidden();
         }
         @Test
-        void nonOwner_shouldThrow403(){
+        void nonOwner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(nonOwner.getEmail(),nonOwner.getPassword());
             doNothing().when(cardService).updateCardStatus(any(UUID.class), any(String.class));
 
@@ -510,22 +491,18 @@ class CardControllerTest {
                     .expectStatus().isForbidden();
         }
         @Test
-        void unauthenticatedUser_shouldThrow403(){
+        void unauthenticatedUser_shouldReturn401(){
             webTestClient.patch()
                     .uri("/cards/status")
                     .bodyValue(new CardIdStatusDto(cardId, CardStatus.blocked))
                     .exchange()
-                    .expectStatus().isForbidden();
+                    .expectStatus().isUnauthorized();
         }
 
     }
 
     @Nested
     class updateCardsTransactionLimitPerDayById {
-        // TODO: @ParameterizedTest with @MethodSource("")
-        void invalidDto_shouldThrow400(){
-
-        }
         @Test
         void admin_success(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(adminDto.getEmail(),adminDto.getPassword());
@@ -539,7 +516,7 @@ class CardControllerTest {
                     .expectStatus().isOk();
         }
         @Test
-        void owner_shouldThrow403(){
+        void owner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(ownerDto.getEmail(),ownerDto.getPassword());
             doNothing().when(cardService).updateCardsTransactionLimitPerDayById(any(UUID.class), any(BigDecimal.class));
 
@@ -551,7 +528,7 @@ class CardControllerTest {
                     .expectStatus().isForbidden();
         }
         @Test
-        void nonOwner_shouldThrow403(){
+        void nonOwner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(nonOwner.getEmail(),nonOwner.getPassword());
             doNothing().when(cardService).updateCardsTransactionLimitPerDayById(any(UUID.class), any(BigDecimal.class));
 
@@ -563,12 +540,12 @@ class CardControllerTest {
                     .expectStatus().isForbidden();
         }
         @Test
-        void unauthenticatedUser_shouldThrow403(){
+        void unauthenticatedUser_shouldReturn401(){
             webTestClient.patch()
                     .uri("/cards/transactionLimitPerDay")
                     .bodyValue(new CardIdLimitDto(cardId, cardDto.getTransactionLimitPerDay()))
                     .exchange()
-                    .expectStatus().isForbidden();
+                    .expectStatus().isUnauthorized();
         }
 
     }
@@ -592,7 +569,7 @@ class CardControllerTest {
             assertNull(cardResponseEntity.getBody());
         }
         @Test
-        void owner_shouldThrow403(){
+        void owner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(ownerDto.getEmail(),ownerDto.getPassword());
             doNothing().when(cardService).deleteCardById(any(UUID.class));
 
@@ -607,7 +584,7 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void nonOwner_shouldThrow403(){
+        void nonOwner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(nonOwner.getEmail(),nonOwner.getPassword());
             doNothing().when(cardService).deleteCardById(any(UUID.class));
 
@@ -622,18 +599,16 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void unauthenticatedUser_shouldThrow403(){
+        void unauthenticatedUser_shouldReturn401(){
             doNothing().when(cardService).deleteCardById(any(UUID.class));
 
-            ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
-                    baseUrl() + "/cards",
-                    HttpMethod.DELETE,
-                    getHttpEntity(new IdDto(cardId),
-                            null),
-                    CardDto.class
-            );
-
-            assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
+            webTestClient.delete()
+                    .uri("/cards")
+                    // there must be body with the id, but there is no body
+                    // while delete method in the web test client.
+                    // But we still can use it cause jwt is checked before validation the data
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
 
     }
@@ -656,7 +631,7 @@ class CardControllerTest {
             assertEquals(HttpStatus.OK, cardResponseEntity.getStatusCode());
         }
         @Test
-        void owner_shouldThrow403(){
+        void owner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(ownerDto.getEmail(),ownerDto.getPassword());
             when(cardService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(cardDto)));
 
@@ -671,7 +646,7 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void nonOwner_shouldThrow403(){
+        void nonOwner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(nonOwner.getEmail(),nonOwner.getPassword());
             when(cardService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(cardDto)));
 
@@ -686,18 +661,13 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void unauthenticatedUser_shouldThrow403(){
+        void unauthenticatedUser_shouldReturn401(){
             when(cardService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(cardDto)));
 
-            ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
-                    baseUrl() + "/cards/all",
-                    HttpMethod.GET,
-                    getHttpEntity(null,
-                            null),
-                    CardDto.class
-            );
-
-            assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
+            webTestClient.get()
+                    .uri("/cards/all")
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
 
     }
@@ -735,7 +705,7 @@ class CardControllerTest {
             assertEquals(HttpStatus.OK, cardResponseEntity.getStatusCode());
         }
         @Test
-        void nonOwner_shouldThrow403(){
+        void nonOwner_shouldReturn403(){
             ResponseEntity<JwtResponseDto> jwtResponseDto = login(nonOwner.getEmail(),nonOwner.getPassword());
             when(cardService.findAllByOwnerId(any(UUID.class), any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(cardDto)));
 
@@ -750,16 +720,12 @@ class CardControllerTest {
             assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
         }
         @Test
-        void unauthenticatedUser_shouldThrow403(){
-            ResponseEntity<CardDto> cardResponseEntity = restTemplate.exchange(
-                    baseUrl() + "/cards/all/owner",
-                    HttpMethod.POST,
-                    getHttpEntity(new IdDto(ownerId),
-                            null),
-                    CardDto.class
-            );
-
-            assertEquals(HttpStatus.FORBIDDEN, cardResponseEntity.getStatusCode());
+        void unauthenticatedUser_shouldReturn401(){
+            webTestClient.post()
+                    .uri("/cards/all/owner")
+                    .bodyValue(new IdDto(ownerId))
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
     }
 }

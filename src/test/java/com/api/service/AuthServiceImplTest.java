@@ -1,6 +1,7 @@
 package com.api.service;
 
 import com.api.config.enums.Role;
+import com.api.exception.AuthException;
 import com.api.security.JwtProvider;
 import com.api.dto.jwt.JwtRequestDto;
 import com.api.dto.jwt.JwtResponseDto;
@@ -109,7 +110,7 @@ class AuthServiceImplTest {
         @Test()
         public void invalidRefreshToken_shouldThrowException() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
-            assertThrows(ForbiddenException.class, () -> authService.getNewAccessToken("invalidToken"));
+            assertThrows(AuthException.class, () -> authService.getNewAccessToken("invalidToken"));
         }
     }
 
@@ -138,7 +139,7 @@ class AuthServiceImplTest {
         @Test()
         public void invalidRefreshToken_shouldThrowException() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
-            assertThrows(ForbiddenException.class, () -> authService.refresh("invalidToken"));
+            assertThrows(AuthException.class, () -> authService.refresh("invalidToken"));
         }
     }
 
@@ -164,7 +165,7 @@ class AuthServiceImplTest {
         public void invalidRefreshToken_shouldThrowException() {
             when(jwtProvider.validateRefreshToken("invalidToken")).thenReturn(false);
 
-            assertThrows(ForbiddenException.class, () -> authService.logout("invalidToken"));
+            assertThrows(AuthException.class, () -> authService.logout("invalidToken"));
         }
 
         @Test()

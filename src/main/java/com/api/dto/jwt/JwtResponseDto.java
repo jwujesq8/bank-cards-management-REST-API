@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Class JwtResponseDto
@@ -13,6 +14,7 @@ import lombok.Getter;
  * This DTO contains the access and refresh tokens used for user authentication.
  */
 @Getter
+@Setter
 @AllArgsConstructor
 @Builder
 public class JwtResponseDto {

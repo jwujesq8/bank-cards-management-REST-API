@@ -143,7 +143,7 @@ public class AuthServiceImpl {
             }
             throw new OkException("User is already logged out");
         }
-//        throw new AuthException("Non valid refresh token");
+        throw new AuthException("Non valid refresh token");
     }
 
     /**
