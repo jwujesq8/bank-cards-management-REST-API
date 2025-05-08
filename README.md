@@ -91,11 +91,11 @@ The `docker-compose.yml` file contains the services for the API and PostgreSQL. 
 - **POST** `/card`: Get a card by ID (Admin or Card Owner).
 - **POST** `/card/new`: Add a new card (Admin only).
 - **PUT** `/card`: Update an existing card (Admin only).
-- **PUT** `/card/status`: Update the status of a card (Admin only). 
-- **PUT** `/card/transactionLimitPerDay`: Update transaction limit per day of a card (Admin only). 
+- **PATCH** `/card/status`: Update the status of a card (Admin only). 
+- **PATCH** `/card/transactionLimitPerDay`: Update transaction limit per day of a card (Admin only). 
 - **DELETE** `/card`: Delete a card by ID (Admin only).
 - **GET** `/card/all`: Get all cards with pagination (Admin only).
-- **GET** `/card/all/owner`: Get all cards by owner ID with pagination (Admin or Card Owner).
+- **POST** `/card/all/owner`: Get all cards by owner ID with pagination (Admin or Card Owner).
 
 ### Transaction Endpoints
 
