@@ -1,18 +1,13 @@
 package com.api.service.it;
 
-import com.api.config.EncryptionUtil;
 import com.api.config.enums.CardStatus;
 import com.api.config.enums.Role;
 import com.api.dto.CardDto;
 import com.api.dto.CardDtoNoId;
-import com.api.dto.TransactionDtoNoId;
 import com.api.dto.UserDto;
 import com.api.entity.User;
-import com.api.repository.CardRepository;
 import com.api.repository.UserRepository;
 import com.api.service.interfaces.CardService;
-import com.api.service.interfaces.TransactionService;
-import com.api.service.interfaces.UserService;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

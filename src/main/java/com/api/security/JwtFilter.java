@@ -1,4 +1,4 @@
-package com.api.config.jwt;
+package com.api.security;
 
 import com.api.config.enums.Role;
 import com.api.service.AuthServiceImpl;

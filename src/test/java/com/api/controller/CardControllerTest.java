@@ -1,6 +1,5 @@
 package com.api.controller;
 
-import com.api.config.PermissionChecker;
 import com.api.config.enums.CardStatus;
 import com.api.dto.*;
 import com.api.dto.jwt.JwtRequestDto;

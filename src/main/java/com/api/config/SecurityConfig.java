@@ -1,5 +1,8 @@
-package com.api.config.jwt;
+package com.api.config;
 
+import com.api.security.JwtAccessDeniedHandler;
+import com.api.security.JwtAuthenticationEntryPoint;
+import com.api.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +32,7 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     /**
      * Configures the HTTP security settings for the application.
@@ -47,9 +51,6 @@ public class SecurityConfig {
                     .httpBasic(AbstractHttpConfigurer::disable)
                     .csrf(AbstractHttpConfigurer::disable)
                     .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .exceptionHandling((exceptions) -> exceptions
-                            .authenticationEntryPoint(jwtAuthenticationEntryPoint) // to handle jwt access token exceptions in the header
-                    )
                     .authorizeHttpRequests(
                             auth -> auth
                                     .requestMatchers(
@@ -60,6 +61,10 @@ public class SecurityConfig {
                     )
                     .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                     .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
+                    .exceptionHandling((exceptions) -> exceptions
+                            .authenticationEntryPoint(jwtAuthenticationEntryPoint) // to handle jwt exceptions in the header
+                            .accessDeniedHandler(jwtAccessDeniedHandler) // to handle admin role exception
+                    )
                     .build();
         }
 

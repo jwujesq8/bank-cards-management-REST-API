@@ -1,4 +1,4 @@
-package com.api.config.jwt;
+package com.api.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +25,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType("application/json");
         response.getWriter().write(
              "{\"dateTime\": \"" + "UTC: " + formatter.format(Instant.now().atZone(ZoneId.of("UTC"))) + "\"," +
-             "\"description\": \"" + authException.getMessage() + "\"}"
+             "\"description\": \"Error with jwt in the header. " + authException.getMessage() + "\"}"
         );
     }
 }

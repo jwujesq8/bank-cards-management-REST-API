@@ -3,6 +3,7 @@ package com.api.config;
 import com.api.dto.CardDto;
 import com.api.dto.CardDtoNoId;
 import com.api.entity.Card;
+import com.api.util.EncryptionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.Converter;

@@ -1,6 +1,6 @@
 package com.api.service;
 
-import com.api.config.EncryptionUtil;
+import com.api.util.EncryptionUtil;
 import com.api.config.enums.CardStatus;
 import com.api.dto.CardDto;
 import com.api.dto.CardDtoNoId;

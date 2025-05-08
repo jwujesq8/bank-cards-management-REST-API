@@ -1,4 +1,4 @@
-package com.api.config;
+package com.api.util;
 
 import com.api.config.enums.CardStatus;
 import com.api.entity.Card;

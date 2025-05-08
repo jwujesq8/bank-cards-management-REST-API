@@ -1,8 +1,7 @@
-package com.api.config.jwt;
+package com.api.security;
 
 import com.api.entity.User;
 import com.api.exception.AuthException;
-import com.api.exception.ForbiddenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -15,9 +14,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;

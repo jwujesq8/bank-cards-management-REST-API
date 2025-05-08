@@ -1,4 +1,4 @@
-package com.api.config;
+package com.api.util;
 
 import com.api.dto.IdDto;
 import com.api.dto.PaymentDto;

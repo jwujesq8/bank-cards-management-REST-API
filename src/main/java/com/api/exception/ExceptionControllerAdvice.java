@@ -1,8 +1,7 @@
-package com.api.exceptionHandler;
+package com.api.exception;
 
 import com.api.dto.error.ErrorMessageResponseDto;
 import com.api.dto.error.ValidationErrorMessageResponseDto;
-import com.api.exception.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;

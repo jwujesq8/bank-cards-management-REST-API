@@ -1,7 +1,7 @@
 package com.api.service;
 
 import com.api.config.enums.Role;
-import com.api.config.jwt.JwtProvider;
+import com.api.security.JwtProvider;
 import com.api.dto.jwt.JwtRequestDto;
 import com.api.dto.jwt.JwtResponseDto;
 import com.api.entity.User;
