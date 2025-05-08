@@ -28,6 +28,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     /**
      * Configures the HTTP security settings for the application.
@@ -46,6 +47,9 @@ public class SecurityConfig {
                     .httpBasic(AbstractHttpConfigurer::disable)
                     .csrf(AbstractHttpConfigurer::disable)
                     .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .exceptionHandling((exceptions) -> exceptions
+                            .authenticationEntryPoint(jwtAuthenticationEntryPoint) // to handle jwt access token exceptions in the header
+                    )
                     .authorizeHttpRequests(
                             auth -> auth
                                     .requestMatchers(

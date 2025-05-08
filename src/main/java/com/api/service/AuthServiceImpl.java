@@ -4,6 +4,7 @@ import com.api.config.jwt.JwtProvider;
 import com.api.dto.jwt.JwtRequestDto;
 import com.api.dto.jwt.JwtResponseDto;
 import com.api.entity.User;
+import com.api.exception.AuthException;
 import com.api.exception.ForbiddenException;
 import com.api.exception.BadRequestException;
 import com.api.exception.OkException;
@@ -59,7 +60,7 @@ public class AuthServiceImpl {
                 return new JwtResponseDto(accessToken, refreshToken);
             }
             else {
-                throw new ForbiddenException("Wrong password");
+                throw new AuthException("Wrong password");
             }
         } else {
             throw new OkException("User is already logged in");
@@ -87,9 +88,9 @@ public class AuthServiceImpl {
                 log.info("{} got new access token", user.getEmail());
                 return new JwtResponseDto(newAccessToken, null);
             }
-            throw new ForbiddenException("Wrong refresh token");
+            throw new AuthException("Wrong refresh token");
         }
-        throw new ForbiddenException("Non valid refresh token");
+        throw new AuthException("Non valid refresh token");
     }
 
     /**
@@ -114,9 +115,9 @@ public class AuthServiceImpl {
                 log.info("{} got new access token and refresh token", user.getEmail());
                 return new JwtResponseDto(newAccessToken, newRefreshToken);
             }
-            throw new ForbiddenException("Wrong refresh token");
+            throw new AuthException("Wrong refresh token");
         }
-        throw new ForbiddenException("Non valid refresh token");
+        throw new AuthException("Non valid refresh token");
     }
 
     /**
@@ -142,7 +143,7 @@ public class AuthServiceImpl {
             }
             throw new OkException("User is already logged out");
         }
-        throw new ForbiddenException("Non valid refresh token");
+//        throw new AuthException("Non valid refresh token");
     }
 
     /**

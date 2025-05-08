@@ -65,6 +65,23 @@ public class ExceptionControllerAdvice {
     }
 
     /**
+     * Handles BadRequestException and returns a BAD_REQUEST response with the error message.
+     *
+     * @param e The BadRequestException to be handled.
+     * @return A ResponseEntity with a custom error message and a BAD_REQUEST status.
+     * @throws JsonProcessingException if the error message cannot be processed.
+     */
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorMessageResponseDto> authExceptionHandler(AuthException e)
+            throws JsonProcessingException {
+        log.error("Exception: AuthException. " +
+                "Exception message: " + e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(getResponseBody(e.getMessage()));
+    }
+
+    /**
      * Handles ForbiddenException and returns an FORBIDDEN response with the error message.
      *
      * @param e The ForbiddenException to be handled.
