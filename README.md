@@ -55,11 +55,11 @@ This is a Spring Boot-based REST API for managing bank cards. It features JWT au
     - `spring.datasource.password=12345`
 
 - **JWT Configuration**
-    - `jwt.access.path=api/src/main/resources/jwt/access.txt`
-    - `jwt.refresh.path=api/src/main/resources/jwt/refresh.txt`
+    - `jwt.access.path=secrets/jwt/access.txt`
+    - `jwt.refresh.path=secrets/jwt/refresh.txt`
 
 - **Encryption Util Configuration**
-    - `secret.key.path=src/main/resources/encryption-util/secret-key.txt`
+    - `secret.key.path=secrets/encryption-util/secret-key.txt`
 
 - **Swagger Configuration**
     - `springdoc.swagger-ui.url=/v1/bank-cards-management-api-docs`
