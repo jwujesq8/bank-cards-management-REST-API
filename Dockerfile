@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY target/bank-cards-management-api.jar app.jar
 
-COPY src/main/resources/encryption-util /app/encryption-util
-COPY src/main/resources/jwt /app/jwt
+COPY secrets/encryption-util /app/encryption-util
+COPY secrets/jwt /app/jwt
 
 ENV SECRET_KEY_PATH=/app/encryption-util/secret-key.txt
 ENV JWT_ACCESS_PATH=/app/jwt/access.txt

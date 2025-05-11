@@ -5,6 +5,7 @@ import com.api.exception.AuthException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,39 +34,33 @@ import java.util.TimeZone;
 @Component
 public class JwtProvider {
 
-    private final SecretKey accessSecretKey;
-    private final SecretKey refreshSecretKey;
+
+    @Value("${jwt.access.path}")
+    private String accessPath;
+
+    @Value("${jwt.refresh.path}")
+    private String refreshPath;
+
+    private SecretKey accessSecretKey;
+    private SecretKey refreshSecretKey;
 
     /**
-     * Constructor that initializes the JwtProvider with the paths to the access and refresh secret key files.
-     * It loads the secret keys from the specified file paths and throws an IOException if the files do not exist.
+     * Post construct for JwtProvider.
      *
-     * @param accessPath the path to the access token secret key file.
-     * @param refreshPath the path to the refresh token secret key file.
-     * @throws IOException if the specified files are not found.
+     * Read jwt tokens from a filepath that is defined in the application.properties.
      */
-    public JwtProvider(
-            @Value("${jwt.access.path}") String accessPath,
-            @Value("${jwt.refresh.path}") String refreshPath,
-            ResourceLoader resourceLoader
-    ) throws IOException {
+    @PostConstruct
+    public void init() throws IOException {
+        accessSecretKey = loadSecretKey(accessPath, "access");
+        refreshSecretKey = loadSecretKey(refreshPath, "refresh");
+    }
 
-        // ACCESS TOKEN
-        Resource accessResource = resourceLoader.getResource(accessPath);
-        if (accessResource.exists()) {
-            String access = new String(accessResource.getInputStream().readAllBytes());
-            accessSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(access));
-        } else {
-            throw new IOException("Access file not found: " + accessPath);
-        }
-
-        // REFRESH TOKEN
-        Resource refreshResource = resourceLoader.getResource(refreshPath);
-        if (refreshResource.exists()) {
-            String refresh = new String(refreshResource.getInputStream().readAllBytes());
-            refreshSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refresh));
-        } else {
-            throw new IOException("Refresh file not found: " + refreshPath);
+    private SecretKey loadSecretKey(String path, String type) throws IOException {
+        try {
+            String keyContent = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            return Keys.hmacShaKeyFor(Decoders.BASE64.decode(keyContent.trim()));
+        } catch (IOException e) {
+            throw new IOException(type + " secret file not found at: " + path, e);
         }
     }
 

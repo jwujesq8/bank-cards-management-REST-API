@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 /**
@@ -24,6 +27,7 @@ public class EncryptionUtil {
      * Secret key used for AES encryption/decryption (must be 16 bytes for AES-128).
      */
     private final String SECRET_KEY;
+
     /**
      * Encryption algorithm used.
      */
@@ -32,19 +36,13 @@ public class EncryptionUtil {
     /**
      * Constructor for EncryptionUtil.
      *
-     * Read secret key from a filepath that is defined in the application.properties
+     * Read secret key from a filepath that is defined in the application.properties.
      */
-    public EncryptionUtil(
-            @Value("${secret.key.path}") String secretKeyPath,
-            ResourceLoader resourceLoader
-    ) throws IOException {
-
-        // SECRET_KEY
-        Resource secretResource = resourceLoader.getResource(secretKeyPath);
-        if (secretResource.exists()) {
-            SECRET_KEY = new String(secretResource.getInputStream().readAllBytes());
-        } else {
-            throw new IOException("Access file not found: " + secretKeyPath.toString());
+    public EncryptionUtil(@Value("${secret.key.path}") String secretKeyPath) throws IOException {
+        try {
+            SECRET_KEY = new String(Files.readAllBytes(Paths.get(secretKeyPath)), StandardCharsets.UTF_8).trim();
+        } catch (IOException e) {
+            throw new IOException("Secret key file not found or unreadable at: " + secretKeyPath, e);
         }
     }
 
