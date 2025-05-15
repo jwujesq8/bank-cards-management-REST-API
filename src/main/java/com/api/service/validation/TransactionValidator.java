@@ -21,7 +21,7 @@ import java.util.UUID;
 public class TransactionValidator {
 
     private final TransactionRepository transactionRepository;
-    private final CardRepository cardRepository;
+    private final CardValidator cardValidator;
 
     @AllArgsConstructor
     @Getter
@@ -30,10 +30,8 @@ public class TransactionValidator {
         private Card destination;
     }
 
-    public Card getCardOrThrow(UUID cardId, String role) {
-        return cardRepository.findById(cardId).orElseThrow(
-                () -> new BadRequestException("There is no such " + role + " card")
-        );
+    public Card getCardOrThrow(UUID cardId, String number) {
+        return cardValidator.getCardOrThrow(cardId, number);
     }
 
     public void validateCardStatus(Card card, String role) {

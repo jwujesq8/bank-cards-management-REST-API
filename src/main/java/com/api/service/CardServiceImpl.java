@@ -1,5 +1,6 @@
 package com.api.service;
 
+import com.api.service.validation.CardValidator;
 import com.api.util.EncryptionUtil;
 import com.api.config.enums.CardStatus;
 import com.api.dto.CardDto;
@@ -31,8 +32,8 @@ import java.util.UUID;
 public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
+    private final CardValidator cardValidator;
     private final ModelMapper modelMapper;
-    private final EncryptionUtil encryptionUtils;
 
     /**
      * Retrieves a card by its ID.
@@ -41,7 +42,8 @@ public class CardServiceImpl implements CardService {
      */
     @Override
     public CardDto getCardById(UUID cardId) {
-        return modelMapper.map(cardRepository.findById(cardId), CardDto.class);
+        Card card = cardValidator.getCardOrThrow(cardId);
+        return modelMapper.map(card, CardDto.class);
     }
 
     /**
@@ -52,10 +54,9 @@ public class CardServiceImpl implements CardService {
      */
     @Override
     public CardDto addCard(CardDtoNoId cardDtoNoId) {
-        cardDtoNoId.setNumber(encryptionUtils.encrypt(cardDtoNoId.getNumber()));
+        Card card = modelMapper.map(cardDtoNoId, Card.class);
         try{
-            Card card = cardRepository.save(modelMapper.map(cardDtoNoId, Card.class));
-            return modelMapper.map(card, CardDto.class);
+            return modelMapper.map(cardRepository.save(card), CardDto.class);
         } catch (DataIntegrityViolationException e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -68,14 +69,14 @@ public class CardServiceImpl implements CardService {
      */
     @Override
     public CardDto updateCard(CardDto cardDto) {
-        Card cardDb = cardRepository.findById(cardDto.getId()).orElseThrow(() ->
-                new BadRequestException("There is no such card"));
-        if(cardDb.getStatus().equals(CardStatus.expired) || cardDb.getStatus().equals(CardStatus.blocked)){
-            throw new BadRequestException("The card can only be changed if the card has not expired or blocked status");
+        Card existingCard = cardValidator.getCardOrThrow(cardDto.getId());
+        if(cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.active)){
+            Card card = modelMapper.map(cardDto, Card.class);
+            return modelMapper.map(cardRepository.save(card), CardDto.class);
+        } else {
+            throw new BadRequestException(
+                    "The card can only be changed if the card has not expired or blocked status");
         }
-        cardDto.setNumber(encryptionUtils.encrypt(cardDto.getNumber()));
-        Card card = cardRepository.save(modelMapper.map(cardDto, Card.class));
-        return modelMapper.map(card, CardDto.class);
     }
 
     /**
@@ -87,9 +88,9 @@ public class CardServiceImpl implements CardService {
     @Transactional
     @Override
     public void updateCardStatus(UUID cardId, String newStatus) {
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new BadRequestException("There is no such card"));
+        Card existingCard = cardValidator.getCardOrThrow(cardId);
         // check if prev card status is not expired
-        if (card.getStatus().equals(CardStatus.expired)){
+        if (cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.expired)){
             throw new BadRequestException("The card status can only be changed if the card has not expired");
         }
         cardRepository.updateStatus(cardId, newStatus);
@@ -104,9 +105,9 @@ public class CardServiceImpl implements CardService {
     @Transactional
     @Override
     public void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit) {
-        Card cardDb = cardRepository.findById(cardId).orElseThrow(() ->
-                new BadRequestException("There is no such card"));
-        if(cardDb.getStatus().equals(CardStatus.expired) || cardDb.getStatus().equals(CardStatus.blocked)){
+        Card existingCard = cardValidator.getCardOrThrow(cardId);
+        if(cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.expired)
+                || cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.blocked)){
             throw new BadRequestException("The card can only be changed if the card has not expired or blocked status");
         }
         cardRepository.updateTransactionLimitPerDayById(cardId, newLimit);
