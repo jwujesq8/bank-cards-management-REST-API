@@ -3,6 +3,7 @@ package com.api.util;
 import com.api.config.enums.CardStatus;
 import com.api.entity.Card;
 import com.api.repository.CardRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,6 +31,7 @@ public class Scheduler {
      */
     @Scheduled(cron = "0 0 0 * * *") // per day at 00:00
     public void checkExpiredCards() {
+        log.info("running expired cards check...");
         List<Card> expiredCards = cardRepository.findExpiredCards(LocalDateTime.now(), CardStatus.expired.name());
         for(Card card: expiredCards){
             card.setStatus(CardStatus.expired);
@@ -37,5 +39,6 @@ public class Scheduler {
                     card.getId(),card.getExpirationDate(), card.getStatus());
         }
         cardRepository.saveAll(expiredCards);
+        log.info("expired cards check is finished...");
     }
 }
