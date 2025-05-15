@@ -54,9 +54,9 @@ public interface TransactionService {
     /**
      * Performs a transaction between two cards.
      *
-     * @param sourceCardId The ID of the source card.
+     * @param sourceCardId      The ID of the source card.
      * @param destinationCardId The ID of the destination card.
-     * @param amount The amount to be transferred between the cards.
+     * @param amount            The amount to be transferred between the cards.
      */
     void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount);
 
