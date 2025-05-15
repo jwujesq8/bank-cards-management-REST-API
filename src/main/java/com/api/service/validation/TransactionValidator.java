@@ -3,7 +3,6 @@ package com.api.service.validation;
 import com.api.config.enums.CardStatus;
 import com.api.entity.Card;
 import com.api.exception.BadRequestException;
-import com.api.repository.CardRepository;
 import com.api.repository.TransactionRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,8 +29,8 @@ public class TransactionValidator {
         private Card destination;
     }
 
-    public Card getCardOrThrow(UUID cardId, String number) {
-        return cardValidator.getCardOrThrow(cardId, number);
+    public Card getCardOrThrow_LockWrite(UUID cardId, String number) {
+        return cardValidator.getCardOrThrow_LockWrite(cardId, number);
     }
 
     public void validateCardStatus(Card card, String role) {
@@ -72,8 +71,8 @@ public class TransactionValidator {
             UUID sourceCardId,
             UUID destinationCardId,
             BigDecimal amount) {
-        Card sourceCard = getCardOrThrow(sourceCardId, "source");
-        Card destinationCard = getCardOrThrow(destinationCardId, "destination");
+        Card sourceCard = getCardOrThrow_LockWrite(sourceCardId, "source");
+        Card destinationCard = getCardOrThrow_LockWrite(destinationCardId, "destination");
 
         validateCardStatus(sourceCard, "source");
         validateCardStatus(destinationCard, "destination");

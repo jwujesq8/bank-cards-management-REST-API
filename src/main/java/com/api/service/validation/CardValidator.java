@@ -23,8 +23,20 @@ public class CardValidator {
         );
     }
 
+    public Card getCardOrThrow_LockWrite(UUID cardId, String role) {
+        return cardRepository.findById(cardId).orElseThrow(
+                () -> new BadRequestException("There is no such " + role + " card")
+        );
+    }
+
     public Card getCardOrThrow(UUID cardId) {
         return cardRepository.findById(cardId).orElseThrow(
+                () -> new BadRequestException("There is no such card")
+        );
+    }
+
+    public Card getCardOrThrow_LockWrite(UUID cardId) {
+        return cardRepository.findByIdLockWrite(cardId).orElseThrow(
                 () -> new BadRequestException("There is no such card")
         );
     }

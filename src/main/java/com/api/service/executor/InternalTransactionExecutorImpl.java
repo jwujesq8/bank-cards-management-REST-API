@@ -21,7 +21,6 @@ public class InternalTransactionExecutorImpl implements InternalTransactionExecu
     /**
      *
      */
-    @Transactional
     @Override
     public void performTransaction(Card sourceCard, Card destinationCard, BigDecimal amount) {
         // Plus amount to the destination and minus from the source

@@ -68,8 +68,9 @@ public class CardServiceImpl implements CardService {
      * @param cardDto The updated card details.
      */
     @Override
+    @Transactional
     public CardDto updateCard(CardDto cardDto) {
-        Card existingCard = cardValidator.getCardOrThrow(cardDto.getId());
+        Card existingCard = cardValidator.getCardOrThrow_LockWrite(cardDto.getId());
         if(cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.active)){
             Card card = modelMapper.map(cardDto, Card.class);
             return modelMapper.map(cardRepository.save(card), CardDto.class);
@@ -88,7 +89,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     @Override
     public void updateCardStatus(UUID cardId, String newStatus) {
-        Card existingCard = cardValidator.getCardOrThrow(cardId);
+        Card existingCard = cardValidator.getCardOrThrow_LockWrite(cardId);
         // check if prev card status is not expired
         if (cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.expired)){
             throw new BadRequestException("The card status can only be changed if the card has not expired");
@@ -105,7 +106,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     @Override
     public void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit) {
-        Card existingCard = cardValidator.getCardOrThrow(cardId);
+        Card existingCard = cardValidator.getCardOrThrow_LockWrite(cardId);
         if(cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.expired)
                 || cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.blocked)){
             throw new BadRequestException("The card can only be changed if the card has not expired or blocked status");

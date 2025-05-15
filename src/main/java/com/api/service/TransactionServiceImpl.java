@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -31,7 +32,6 @@ import java.util.concurrent.CompletableFuture;
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final CardRepository cardRepository;
     private final ModelMapper modelMapper;
     private final InternalTransactionExecutor internalTransactionExecutor;
     private final TransactionValidator transactionValidator;
@@ -100,6 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @throws BadRequestException If any validation check fails.
      */
     @Override
+    @Transactional
     public void makeTransaction(UUID sourceCardId, UUID destinationCardId, BigDecimal amount){
         // Validation to make transaction (different cards, same owner, day limit etc.)
         TransactionValidator.SourceAndDestinationCards sourceAndDestinationCards =
