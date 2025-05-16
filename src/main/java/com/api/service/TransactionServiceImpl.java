@@ -63,6 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @param transactionDto The updated transaction details.
      */
     @Override
+    @Transactional
     public TransactionDto updateTransaction(TransactionDto transactionDto) {
         Transaction transaction = transactionRepository.save(modelMapper.map(transactionDto, Transaction.class));
         return modelMapper.map(transaction, TransactionDto.class);
