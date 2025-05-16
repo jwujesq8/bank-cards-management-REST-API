@@ -1,13 +1,12 @@
 package com.api.controller;
 
-import com.api.config.enums.CardStatus;
 import com.api.dto.*;
 import com.api.dto.jwt.JwtRequestDto;
 import com.api.dto.jwt.JwtResponseDto;
 import com.api.repository.CardRepository;
 import com.api.repository.TransactionRepository;
 import com.api.repository.UserRepository;
-import com.api.service.AuthServiceImpl;
+import com.api.service.auth.AuthServiceImpl;
 import com.api.service.interfaces.TransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;

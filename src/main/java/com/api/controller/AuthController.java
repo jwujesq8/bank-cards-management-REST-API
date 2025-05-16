@@ -4,7 +4,7 @@ import com.api.dto.error.ErrorMessageResponseDto;
 import com.api.dto.jwt.JwtRequestDto;
 import com.api.dto.jwt.JwtResponseDto;
 import com.api.dto.jwt.RefreshJwtRequestDto;
-import com.api.service.AuthServiceImpl;
+import com.api.service.auth.AuthServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

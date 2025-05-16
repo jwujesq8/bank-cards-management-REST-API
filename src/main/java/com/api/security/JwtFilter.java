@@ -1,7 +1,7 @@
 package com.api.security;
 
 import com.api.config.enums.Role;
-import com.api.service.AuthServiceImpl;
+import com.api.service.auth.AuthServiceImpl;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
