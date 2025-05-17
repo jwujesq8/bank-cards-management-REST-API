@@ -41,7 +41,7 @@ public class CardValidator {
         );
     }
 
-    public boolean doesCardStatusEqualTo(Card card, CardStatus cardStatus){
+    public boolean isCardStatusEqualTo(Card card, CardStatus cardStatus){
         return card.getStatus().equals(cardStatus);
     }
 }

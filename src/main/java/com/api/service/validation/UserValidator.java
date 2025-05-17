@@ -31,7 +31,7 @@ public class UserValidator {
                 orElseThrow(() -> new ForbiddenException("User not found"));
     }
 
-    public boolean doesUserPasswordEqualTo(User user, String givenPassword){
+    public boolean isUserPasswordEqualTo(User user, String givenPassword){
         return user.getPassword().equals(givenPassword);
     }
 }

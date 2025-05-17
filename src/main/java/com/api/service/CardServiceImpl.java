@@ -1,7 +1,6 @@
 package com.api.service;
 
 import com.api.service.validation.CardValidator;
-import com.api.util.EncryptionUtil;
 import com.api.config.enums.CardStatus;
 import com.api.dto.CardDto;
 import com.api.dto.CardDtoNoId;
@@ -71,7 +70,7 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public CardDto updateCard(CardDto cardDto) {
         Card existingCard = cardValidator.getCardOrThrow_LockWrite(cardDto.getId());
-        if(cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.active)){
+        if(cardValidator.isCardStatusEqualTo(existingCard, CardStatus.active)){
             Card card = modelMapper.map(cardDto, Card.class);
             return modelMapper.map(cardRepository.save(card), CardDto.class);
         } else {
@@ -91,7 +90,7 @@ public class CardServiceImpl implements CardService {
     public void updateCardStatus(UUID cardId, String newStatus) {
         Card existingCard = cardValidator.getCardOrThrow_LockWrite(cardId);
         // check if prev card status is not expired
-        if (cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.expired)){
+        if (cardValidator.isCardStatusEqualTo(existingCard, CardStatus.expired)){
             throw new BadRequestException("The card status can only be changed if the card has not expired");
         }
         cardRepository.updateStatus(cardId, newStatus);
@@ -107,8 +106,8 @@ public class CardServiceImpl implements CardService {
     @Override
     public void updateCardsTransactionLimitPerDayById(UUID cardId, BigDecimal newLimit) {
         Card existingCard = cardValidator.getCardOrThrow_LockWrite(cardId);
-        if(cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.expired)
-                || cardValidator.doesCardStatusEqualTo(existingCard, CardStatus.blocked)){
+        if(cardValidator.isCardStatusEqualTo(existingCard, CardStatus.expired)
+                || cardValidator.isCardStatusEqualTo(existingCard, CardStatus.blocked)){
             throw new BadRequestException("The card can only be changed if the card has not expired or blocked status");
         }
         cardRepository.updateTransactionLimitPerDayById(cardId, newLimit);

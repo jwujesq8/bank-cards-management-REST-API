@@ -36,7 +36,7 @@ public class AuthServiceImpl {
             throw new OkException("User is already logged in");
         }
 
-        if (!userValidator.doesUserPasswordEqualTo(user, dto.getPassword())) {
+        if (!userValidator.isUserPasswordEqualTo(user, dto.getPassword())) {
             throw new AuthException("Wrong password");
         }
 
