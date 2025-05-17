@@ -33,12 +33,17 @@ public class Scheduler {
     public void checkExpiredCards() {
         log.info("running expired cards check...");
         List<Card> expiredCards = cardRepository.findExpiredCards(LocalDateTime.now(), CardStatus.expired.name());
-        for(Card card: expiredCards){
-            card.setStatus(CardStatus.expired);
-            log.info("expired card (id: {}, expired_date: {}, new status: {})",
-                    card.getId(),card.getExpirationDate(), card.getStatus());
+        if(!expiredCards.isEmpty()){
+            for(Card card: expiredCards){
+                card.setStatus(CardStatus.expired);
+                log.info("expired card (id: {}, expired_date: {}, new status: {})",
+                        card.getId(),card.getExpirationDate(), card.getStatus());
+                cardRepository.saveAll(expiredCards);
+                log.info("expired cards check is finished...");
+            }
+        } else {
+            log.info("there is no expired cards. check is finished...");
         }
-        cardRepository.saveAll(expiredCards);
-        log.info("expired cards check is finished...");
+
     }
 }

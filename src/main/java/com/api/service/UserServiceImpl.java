@@ -7,6 +7,7 @@ import com.api.entity.User;
 import com.api.exception.BadRequestException;
 import com.api.repository.UserRepository;
 import com.api.service.interfaces.UserService;
+import com.api.service.validation.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserValidator userValidator;
     private final ModelMapper modelMapper;
 
     /**
@@ -44,8 +46,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDto getUserById(IdDto idDto) {
-        return modelMapper.map(userRepository.findById(idDto.getId()).orElseThrow(() ->
-                new BadRequestException("There is no such user")), UserDto.class);
+        return modelMapper.map(userValidator.getUserByIdOrThrowBadRequest(idDto.getId()),
+                UserDto.class);
     }
 
     /**

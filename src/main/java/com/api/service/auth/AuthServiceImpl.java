@@ -4,10 +4,8 @@ import com.api.dto.jwt.JwtRequestDto;
 import com.api.dto.jwt.JwtResponseDto;
 import com.api.entity.User;
 import com.api.exception.AuthException;
-import com.api.exception.ForbiddenException;
 import com.api.exception.OkException;
 import com.api.security.RefreshTokenStore;
-import com.api.service.interfaces.UserService;
 import com.api.service.validation.UserValidator;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
@@ -32,7 +30,7 @@ public class AuthServiceImpl {
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     public JwtResponseDto login(@Valid @NotNull JwtRequestDto dto) {
-        final User user = userValidator.getUserByEmailOtThrowBadRequest(dto.getEmail());
+        final User user = userValidator.getUserByEmailOrThrowBadRequest(dto.getEmail());
 
         if (tokenStore.contains(user.getEmail())) {
             throw new OkException("User is already logged in");
@@ -62,10 +60,10 @@ public class AuthServiceImpl {
             throw new AuthException("Wrong refresh token");
         }
 
-        final User user = userValidator.getUserByEmailOtThrowForbidden(email);
+        final User user = userValidator.getUserByEmailOrThrowForbidden(email);
 
         final String newAccessToken = tokenService.generateAccessToken(user);
-        tokenStore.clearRefreshToken(user.getEmail());
+        tokenStore.invalidate(user.getEmail());
 
         log.info("{} got new access token", user.getEmail());
         return new JwtResponseDto(newAccessToken, null);
@@ -83,7 +81,7 @@ public class AuthServiceImpl {
             throw new AuthException("Wrong refresh token");
         }
 
-        final User user = userValidator.getUserByEmailOtThrowForbidden(email);
+        final User user = userValidator.getUserByEmailOrThrowForbidden(email);
 
         final String newAccessToken = tokenService.generateAccessToken(user);
         final String newRefreshToken = tokenService.generateRefreshToken(user);
@@ -101,11 +99,7 @@ public class AuthServiceImpl {
         final Claims claims = tokenService.getRefreshClaims(refreshToken);
         final String email = claims.getSubject();
 
-        if (!tokenStore.validateToken(email, refreshToken)) {
-            throw new OkException("User is already logged out");
-        }
-
-        final User user = userValidator.getUserByEmailOtThrowForbidden(email);
+        final User user = userValidator.getUserByEmailOrThrowForbidden(email);
 
         tokenStore.invalidate(user.getEmail());
         log.info("{} is logged out", user.getEmail());

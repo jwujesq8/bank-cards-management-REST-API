@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -15,11 +17,16 @@ public class UserValidator {
 
     private final UserRepository userRepository;
 
-    public User getUserByEmailOtThrowBadRequest(String email){
+    public User getUserByIdOrThrowBadRequest(UUID id){
+        return userRepository.findById(id).orElseThrow(() ->
+                new BadRequestException("There is no such user"));
+    }
+
+    public User getUserByEmailOrThrowBadRequest(String email){
         return userRepository.findByEmail(email).
                 orElseThrow(() -> new BadRequestException("User not found"));
     }
-    public User getUserByEmailOtThrowForbidden(String email){
+    public User getUserByEmailOrThrowForbidden(String email){
         return userRepository.findByEmail(email).
                 orElseThrow(() -> new ForbiddenException("User not found"));
     }

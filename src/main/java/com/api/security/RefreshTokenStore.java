@@ -1,10 +1,12 @@
 package com.api.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@Slf4j
 @Component
 public class RefreshTokenStore {
 
@@ -36,9 +38,5 @@ public class RefreshTokenStore {
 
     public String get(String email) {
         return tokens.get(email);
-    }
-
-    public void clearRefreshToken(String email) {
-        tokens.replace(email, null);
     }
 }
