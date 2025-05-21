@@ -51,4 +51,10 @@ class CardServiceImpl_IT {
         assertEquals("****-****-****-4444", cardDto.getNumber());
 
     }
+    // TODO:
+    @Test
+    public void addCard_EncryptedNumberIsSavedInDB(){
+
+
+    }
 }
