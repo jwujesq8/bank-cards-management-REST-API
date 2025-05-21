@@ -10,6 +10,7 @@ import com.api.service.validation.UserValidator;
 import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl {
 
     private final TokenService tokenService;
+    @Getter
     private final RefreshTokenStore tokenStore;
     private final UserValidator userValidator;
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);

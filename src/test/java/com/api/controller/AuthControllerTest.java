@@ -40,8 +40,6 @@ class AuthControllerTest {
     @MockBean
     private UserRepository userRepository;
     @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
     private AuthServiceImpl authService;
@@ -84,7 +82,7 @@ class AuthControllerTest {
     void tearDown() {
         reset(userRepository);
         SecurityContextHolder.clearContext();
-        authService.getRefreshTokensStorage().clear();
+        authService.getTokenStore().clear();
     }
 
     @Nested
@@ -126,7 +124,7 @@ class AuthControllerTest {
         }
 
         @Test
-        void wrongPassword_shouldThrowBadRequest() {
+        void wrongPassword_shouldThrowException() {
             JwtRequestDto jwtRequestDto = JwtRequestDto.builder()
                     .email("user@gmail.com")
                     .password("wrong_password")
@@ -198,7 +196,7 @@ class AuthControllerTest {
         }
 
         @Test
-        void withoutRefreshToken_shouldReturnStatus400() {
+        void withoutRefreshToken_shouldReturn400() {
             ResponseEntity<JwtResponseDto> responseDtoResponseEntity = login("user@gmail.com","123_password");
             assertNotNull(responseDtoResponseEntity);
 

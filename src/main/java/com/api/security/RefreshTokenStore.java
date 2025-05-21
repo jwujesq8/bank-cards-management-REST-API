@@ -39,4 +39,8 @@ public class RefreshTokenStore {
     public String get(String email) {
         return tokens.get(email);
     }
+
+    public void clear() {
+        tokens.clear();
+    }
 }
